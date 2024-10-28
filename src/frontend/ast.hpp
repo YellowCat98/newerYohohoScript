@@ -1,5 +1,4 @@
 #pragma once
-#include "lexer.hpp"
 #include <optional>
 
 namespace frontend {

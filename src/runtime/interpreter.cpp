@@ -1,4 +1,6 @@
 #include "interpreter.hpp"
+#include <iostream>
+#include "../utils.hpp"
 
 using namespace runtime;
 using namespace frontend;
@@ -62,13 +64,30 @@ values::RuntimeVal* interpreter::evaluate_call_expr(AST::CallExpr* expr, Environ
     }
     auto fn = evaluate(expr->caller, env);
 
-    if (fn->type != values::ValueType::NativeFn) {
-        throw std::invalid_argument("Cannot call value as it is not a function.");
+    if (fn->type == values::ValueType::NativeFn) {
+        auto result = dynamic_cast<values::NativeFnValue*>(fn)->call(args, env);
+        return result;
     }
 
-    auto result = dynamic_cast<values::NativeFnValue*>(fn)->call(args, env);
+    if (fn->type == values::ValueType::Function) {
+        
+        auto func = dynamic_cast<values::FunValue*>(fn);
+        auto scope = new Environment(func->decEnv);
 
-    return result;
+        for (int i = 0; i < func->params.size(); ++i) {
+            auto name = func->params[i];
+            scope->declareVar(name, args[i], false);
+        }
+
+        auto result = new values::RuntimeVal();
+        for (auto& stmt : func->body) {
+            result = evaluate(stmt, scope);
+        }
+
+        return result;
+    }
+
+    throw std::invalid_argument("Interpreter: Cannot call value that is not a function.");
 }
 
 values::RuntimeVal* interpreter::evaluate_var_declaration(AST::VarDeclare* declaration, Environment* env) {
@@ -82,6 +101,16 @@ values::RuntimeVal* interpreter::evaluate_assignment(AST::AssignExpr* node, Envi
     }
     auto name = dynamic_cast<AST::Identifier*>(node->assigne)->symbol;
     return env->assignVar(name, evaluate(node->value, env));
+}
+
+values::RuntimeVal* interpreter::evaluate_fun_declaration(AST::FunDeclare* declaration, Environment* env) {
+    auto fn = new values::FunValue();
+    fn->name = declaration->name;
+    fn->params = declaration->parameters;
+    fn->decEnv = env;
+    fn->body = declaration->body;
+
+    return env->declareVar(declaration->name, fn, true);
 }
 
 values::RuntimeVal* interpreter::evaluate(AST::Stmt* astNode, Environment* env) {
@@ -111,6 +140,9 @@ values::RuntimeVal* interpreter::evaluate(AST::Stmt* astNode, Environment* env) 
         }
         case AST::NodeType::CallExpr: {
             return evaluate_call_expr(dynamic_cast<AST::CallExpr*>(astNode), env);
+        }
+        case AST::NodeType::FunctionDeclaration: {
+            return evaluate_fun_declaration(dynamic_cast<AST::FunDeclare*>(astNode), env);
         }
         default: {
             std::cout << "Interpreter: This AST has not been yet setup for interpretation." << std::endl; // message mainly for things that i havent implemented in the interpreter yet.

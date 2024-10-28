@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <functional>
 #include <deque>
+#include "../frontend/ast.hpp"
 
 namespace runtime {
     class Environment;
@@ -14,7 +15,8 @@ namespace runtime {
             Number, // 1
             Boolean, // 2
             Object, // 3
-            NativeFn // 4
+            NativeFn, // 4
+            Function // 5
         };
 
         struct RuntimeVal {
@@ -64,6 +66,17 @@ namespace runtime {
             }
 
             FunctionCall call;
+        };
+
+        struct FunValue : public RuntimeVal { // undertale reference???
+            FunValue() {
+                type = ValueType::Function;
+            }
+
+            std::string name;
+            std::deque<std::string> params;
+            Environment* decEnv;
+            std::deque<frontend::AST::Stmt*> body;
         };
     };
 }
