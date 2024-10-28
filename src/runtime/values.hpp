@@ -2,6 +2,8 @@
 #include <string>
 #include <unordered_map>
 #include <functional>
+#include "environment.hpp"
+#include <deque>
 
 namespace runtime {
     class values {

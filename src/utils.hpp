@@ -19,7 +19,7 @@ namespace utils {
 
     inline bool isInt(const std::string& str) {
         try {
-            std::stoi(str);
+            auto num = std::stoi(str); // useless value!
             return true;
         } catch (...) {
             return false;
