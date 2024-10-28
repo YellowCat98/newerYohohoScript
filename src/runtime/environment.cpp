@@ -1,4 +1,5 @@
 #include "environment.hpp"
+#include "../utils.hpp"
 
 using namespace runtime;
 
@@ -8,9 +9,9 @@ Environment* Environment::setupEnv() {
     env->declareVar("true", utils::MK_BOOL(true), true);
     env->declareVar("false", utils::MK_BOOL(false), true);
 
-    //env->declareVar("print", utils::MK_NATIVE_FN([](std::deque<values::RuntimeVal*> args, Environment* scope) -> values::RuntimeVal* {
-    //    return new values::RuntimeVal();
-    //}), true);
+    env->declareVar("print", utils::MK_NATIVE_FN([](std::deque<values::RuntimeVal*> args, Environment* scope) -> values::RuntimeVal* {
+        return utils::MK_NULL();
+    }), true);
     return env;
 }
 

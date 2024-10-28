@@ -2,10 +2,10 @@
 #include <string>
 #include <unordered_map>
 #include <functional>
-#include "environment.hpp"
 #include <deque>
 
 namespace runtime {
+    class Environment;
     class values {
     public:
         values() = delete;
