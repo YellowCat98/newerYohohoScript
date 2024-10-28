@@ -14,6 +14,7 @@ namespace runtime {
         values::RuntimeVal* evaluate_assignment(frontend::AST::AssignExpr* node, Environment* env);
         values::RuntimeVal* evaluate_identifier(frontend::AST::Identifier* ident, Environment* env);
         values::RuntimeVal* evaluate_object_expr(frontend::AST::ObjectLiteral* obj, Environment* env);
+        values::RuntimeVal* evaluate_call_expr(frontend::AST::CallExpr* expr, Environment* env);
     public:
         interpreter() {}
         values::RuntimeVal* evaluate(frontend::AST::Stmt* astNode, Environment* env);

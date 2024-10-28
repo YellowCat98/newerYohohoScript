@@ -96,7 +96,10 @@ AST::Expr* Parser::parse_call_expr(AST::Expr* caller) {
 
 std::deque<AST::Expr*> Parser::parse_args() {
     expect(Lexer::TokenType::OpenParen, "Expected open parenthesis.");
-    std::deque<AST::Expr*> args = parse_arguments_list();
+    std::deque<AST::Expr*> args;
+    if (at()->type != Lexer::TokenType::CloseParen) {
+        args = parse_arguments_list();
+    }
 
     expect(Lexer::TokenType::CloseParen, "Missing closing parenthisis.");
 
@@ -106,8 +109,14 @@ std::deque<AST::Expr*> Parser::parse_args() {
 std::deque<AST::Expr*> Parser::parse_arguments_list() {
     std::deque<AST::Expr*> args;
 
-    while (notEOF() && at()->type == Lexer::TokenType::Comma && eat()) {
-        args.push_back(parse_assignment_expr());
+    while (notEOF()) {
+        if (at()->type == Lexer::TokenType::Comma) {
+            eat();
+        } else if (at()->type == Lexer::TokenType::CloseParen) {
+            break;
+        } else {
+            args.push_back(parse_assignment_expr());
+        }
     }
 
     return args;

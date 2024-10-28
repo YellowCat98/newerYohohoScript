@@ -79,10 +79,6 @@ int main(int argc, const char* argv[]) {
         auto program = parser->produceAST(source);
         auto evaluated = interpreter->evaluate(program, env);
 
-        if (evaluated->type == runtime::values::ValueType::NativeFn) {
-            fmt::print("{}", typeid(dynamic_cast<runtime::values::NativeFnValue*>(evaluated)->call).name());
-        }
-
         //auto lexer = new Lexer();
         //auto tokens = lexer->tokenize(source);
         //for (auto& token : tokens) {

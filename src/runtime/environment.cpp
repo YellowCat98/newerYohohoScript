@@ -1,5 +1,6 @@
 #include "environment.hpp"
 #include "../utils.hpp"
+#include <iostream>
 
 using namespace runtime;
 
@@ -10,8 +11,25 @@ Environment* Environment::setupEnv() {
     env->declareVar("false", utils::MK_BOOL(false), true);
 
     env->declareVar("print", utils::MK_NATIVE_FN([](std::deque<values::RuntimeVal*> args, Environment* scope) -> values::RuntimeVal* {
+        for (auto& arg : args) {
+            if (arg->type == values::ValueType::Number) {
+                std::cout << dynamic_cast<values::NumVal*>(arg)->value;
+            }
+        }
+
         return utils::MK_NULL();
     }), true);
+
+    env->declareVar("add", utils::MK_NATIVE_FN([](std::deque<values::RuntimeVal*> args, Environment* scope) -> values::RuntimeVal* {
+        for (auto& arg : args) {
+            if (arg->type == values::ValueType::Number) {
+                std::cout << dynamic_cast<values::NumVal*>(arg)->value;
+            }
+        }
+
+        return utils::MK_NULL();
+    }), true);
+
     return env;
 }
 

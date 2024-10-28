@@ -9,4 +9,4 @@ const obj = {
     },
 };
 
-print
+print(45 / 2, 12)

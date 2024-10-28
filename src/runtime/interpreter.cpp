@@ -55,6 +55,22 @@ values::RuntimeVal* interpreter::evaluate_object_expr(AST::ObjectLiteral* obj, E
     return object;
 }
 
+values::RuntimeVal* interpreter::evaluate_call_expr(AST::CallExpr* expr, Environment* env) {
+    std::deque<values::RuntimeVal*> args;
+    for (auto& arg : expr->args) {
+        args.push_back(evaluate(arg, env));
+    }
+    auto fn = evaluate(expr->caller, env);
+
+    if (fn->type != values::ValueType::NativeFn) {
+        throw std::invalid_argument("Cannot call value as it is not a function.");
+    }
+
+    auto result = dynamic_cast<values::NativeFnValue*>(fn)->call(args, env);
+
+    return result;
+}
+
 values::RuntimeVal* interpreter::evaluate_var_declaration(AST::VarDeclare* declaration, Environment* env) {
     auto value = declaration->value ? evaluate(*declaration->value, env) : utils::MK_NULL();
     return env->declareVar(declaration->identifier, value, declaration->constant);
@@ -92,6 +108,9 @@ values::RuntimeVal* interpreter::evaluate(AST::Stmt* astNode, Environment* env) 
         }
         case AST::NodeType::ObjectLiteral: {
             return evaluate_object_expr(dynamic_cast<AST::ObjectLiteral*>(astNode), env);
+        }
+        case AST::NodeType::CallExpr: {
+            return evaluate_call_expr(dynamic_cast<AST::CallExpr*>(astNode), env);
         }
         default: {
             std::cout << "Interpreter: This AST Node has not been yet setup for interpretation." << std::endl;
