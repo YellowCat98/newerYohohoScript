@@ -153,6 +153,8 @@ AST::Expr* Parser::parse_member_expr() {
     return object;
 }
 
+
+
 AST::Expr* Parser::parse_multiplicative_expr() {
     auto left = this->parse_call_member_expr();
 
@@ -228,6 +230,37 @@ AST::Expr* Parser::parse_object_expr() {
     return return_val;
 }
 
+AST::Stmt* Parser::parse_fun_declaration() {
+    eat(); // eating fun
+    auto name = expect(Lexer::TokenType::Identifier, "Expected identifier after `fun` keyword")->value;
+
+    auto args = parse_args(); // we dont need to use another function for parsing params, this is enough.
+    std::deque<std::string> params;
+
+    for (auto& arg : args) {
+        if (arg->kind != AST::NodeType::Identifier) {
+            throw std::invalid_argument("Expected params to be an identifier.");
+        }
+
+        params.push_back(dynamic_cast<AST::Identifier*>(arg)->symbol); // dyanmic_cast is guaranteed to not return a nullptr, as we check if its of kind AST::NodeType::Identifier earlier, this code will never be reached if the condition isnt met.
+    }
+
+    expect(Lexer::TokenType::OpenBrace, "Expected '{' following function declaration.");
+
+    std::deque<AST::Stmt*> body;
+
+    while (at()->type != Lexer::TokenType::EOF_  && at()->type != Lexer::TokenType::CloseBrace) {
+        body.push_back(parse_stmt());
+    }
+
+    expect(Lexer::TokenType::CloseBrace, "Expected closing brace inside function declaration.");
+    auto fn = new AST::FunDeclare();
+    fn->body = body;
+    fn->name = name;
+    fn->parameters = params;
+    return fn;
+}
+
 AST::Expr* Parser::parse_expr() {
     return this->parse_assignment_expr();
 }
@@ -262,6 +295,9 @@ AST::Stmt* Parser::parse_stmt() {
         }
         case Lexer::TokenType::Const: {
             return this->parse_var_declaration();
+        }
+        case Lexer::TokenType::Fun: {
+            return this->parse_fun_declaration();
         }
         default: {
             return this->parse_expr();

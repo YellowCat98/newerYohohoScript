@@ -20,16 +20,6 @@ Environment* Environment::setupEnv() {
         return utils::MK_NULL();
     }), true);
 
-    env->declareVar("add", utils::MK_NATIVE_FN([](std::deque<values::RuntimeVal*> args, Environment* scope) -> values::RuntimeVal* {
-        for (auto& arg : args) {
-            if (arg->type == values::ValueType::Number) {
-                std::cout << dynamic_cast<values::NumVal*>(arg)->value;
-            }
-        }
-
-        return utils::MK_NULL();
-    }), true);
-
     return env;
 }
 

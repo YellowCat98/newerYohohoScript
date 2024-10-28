@@ -25,6 +25,7 @@ namespace frontend {
         std::deque<AST::Expr*> parse_args();
         std::deque<AST::Expr*> parse_arguments_list();
         AST::Expr* parse_member_expr();
+        AST::Stmt* parse_fun_declaration();
         Lexer::Token* eat();
         Lexer::Token* at();
         Lexer::Token* expect(Lexer::TokenType type, std::string err);

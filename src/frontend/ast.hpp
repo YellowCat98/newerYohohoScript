@@ -15,7 +15,8 @@ namespace frontend {
             Property, // 6
             ObjectLiteral, // 7
             MemberExpr, // 8
-            CallExpr // 9
+            CallExpr, // 9
+            FunctionDeclaration // 10
         };
 
         struct Stmt {
@@ -110,6 +111,16 @@ namespace frontend {
             Expr* object;
             Expr* property;
             bool computed;
+        };
+
+        struct FunDeclare : public Stmt {
+            FunDeclare() {
+                this->kind = NodeType::FunctionDeclaration;
+            }
+
+            std::deque<std::string> parameters;
+            std::string name;
+            std::deque<Stmt*> body;
         };
 
     };

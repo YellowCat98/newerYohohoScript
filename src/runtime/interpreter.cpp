@@ -113,7 +113,7 @@ values::RuntimeVal* interpreter::evaluate(AST::Stmt* astNode, Environment* env) 
             return evaluate_call_expr(dynamic_cast<AST::CallExpr*>(astNode), env);
         }
         default: {
-            std::cout << "Interpreter: This AST Node has not been yet setup for interpretation." << std::endl;
+            std::cout << "Interpreter: This AST has not been yet setup for interpretation." << std::endl; // message mainly for things that i havent implemented in the interpreter yet.
             exit(1);
         }
     }

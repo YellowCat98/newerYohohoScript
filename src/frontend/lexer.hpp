@@ -29,8 +29,9 @@ namespace frontend {
             CloseBrack, // 13
             Colon, // 14
             Dot, // 15
-            Null, // 16
-            EOF_, // 17
+            Fun, // 16
+            Null, // 17
+            EOF_, // 18
         };
         struct Token {
             std::string value;
@@ -47,7 +48,8 @@ namespace frontend {
 
         std::unordered_map<std::string, Lexer::TokenType> RESERVED = {
             {"var", Lexer::TokenType::Var},
-            {"const", Lexer::TokenType::Const}
+            {"const", Lexer::TokenType::Const},
+            {"fun", Lexer::TokenType::Fun}
         };
     };
 }

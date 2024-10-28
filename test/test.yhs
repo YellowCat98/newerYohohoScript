@@ -1,12 +1,7 @@
-var foo = 5;
+fun add(x, y) {
+    print(x + y)
 
-const obj = {
-    x: 123,
-    y: 500,
-    foo: foo,
-    complex: {
-        gyatt: 2,
-    },
-};
+    x  y
+}
 
-print(45 / 2, 12)
+add(1, 2)
