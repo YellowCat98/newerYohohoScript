@@ -1,0 +1,11 @@
+var foo = 5;
+
+const obj = {
+    x: 123,
+    y: 500,
+    foo: foo,
+    complex: {
+        gyatt: 2,
+    },
+};
+
