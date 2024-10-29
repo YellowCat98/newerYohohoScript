@@ -15,7 +15,9 @@ namespace frontend {
             ObjectLiteral, // 7
             MemberExpr, // 8
             CallExpr, // 9
-            FunctionDeclaration // 10
+            FunctionDeclaration, // 10
+            If,
+            Else
         };
 
         struct Stmt {
@@ -122,5 +124,24 @@ namespace frontend {
             std::deque<Stmt*> body;
         };
 
+        struct ElseStmt : public Stmt {
+            ElseStmt() {
+                this->kind = NodeType::Else;
+            }
+
+            bool multiline;
+            std::deque<AST::Stmt*> body;
+        };
+
+        struct IfStmt : public Stmt {
+            IfStmt() {
+                this->kind = NodeType::If;
+            }
+
+            AST::Expr* condition;
+            bool multiline;
+            std::deque<AST::Stmt*> body;
+            std::optional<AST::ElseStmt*> elseBody;
+        };
     };
 }

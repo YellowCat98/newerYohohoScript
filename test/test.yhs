@@ -1,21 +1,7 @@
-const obj = {
-    x: 123,
-    y: 233,
-    complex: {
-        x: 4,
-        b: (5 + 2),
-        a: 2 /3,
-    },
-};
-
 fun main() {
-    print(5)
-    exit()
-}
-
-fun exit() {
-    free(print)
-    free(exit)
+    if true {
+        print(5)
+    }
 }
 
 main()

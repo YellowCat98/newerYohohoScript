@@ -288,6 +288,35 @@ AST::Stmt* Parser::parse_var_declaration() {
     return declaration;
 }
 
+AST::Stmt* Parser::parse_if_condition() {
+    eat(); // eat the if statement
+
+    auto ifstmt = new AST::IfStmt();
+    ifstmt->condition = this->parse_expr();
+
+
+    if (at()->type == Lexer::TokenType::OpenBrace) {
+        eat();
+        ifstmt->multiline = true;
+
+        while (at()->type != Lexer::TokenType::EOF_ && at()->type != Lexer::TokenType::CloseBrace) {
+            ifstmt->body.push_back(parse_stmt());
+        }
+
+        expect(Lexer::TokenType::CloseBrace, "Expected closing brace for if statement.");
+    } else {
+        ifstmt->multiline = false;
+
+        while (at()->type != Lexer::TokenType::EOF_ && at()->type != Lexer::TokenType::Semicolon) {
+            ifstmt->body.push_back(parse_stmt());
+        }
+
+        expect(Lexer::TokenType::Semicolon, "Expected semicolon after single-line if statement.");
+    }
+
+    return ifstmt;
+}
+
 AST::Stmt* Parser::parse_stmt() {
     switch (at()->type) {
         case Lexer::TokenType::Var: {
@@ -298,6 +327,9 @@ AST::Stmt* Parser::parse_stmt() {
         }
         case Lexer::TokenType::Fun: {
             return this->parse_fun_declaration();
+        }
+        case Lexer::TokenType::If: {
+            return this->parse_if_condition();
         }
         default: {
             return this->parse_expr();
