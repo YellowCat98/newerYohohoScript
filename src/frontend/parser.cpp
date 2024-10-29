@@ -314,6 +314,32 @@ AST::Stmt* Parser::parse_if_condition() {
         expect(Lexer::TokenType::Semicolon, "Expected semicolon after single-line if statement.");
     }
 
+    if (at()->type == Lexer::TokenType::Else) {
+        eat();
+        auto elsestmt = new AST::ElseStmt();
+
+        if (at()->type == Lexer::TokenType::OpenBrace) {
+            elsestmt->multiline = true;
+            eat();
+
+            while (at()->type != Lexer::TokenType::EOF_ && at()->type != Lexer::TokenType::CloseBrace) {
+                elsestmt->body.push_back(parse_stmt());
+            }
+
+            expect(Lexer::TokenType::CloseBrace, "Expected closing brace after `else` statement.");
+        } else {
+            elsestmt->multiline = false;
+
+            while (at()->type != Lexer::TokenType::EOF_ && at()->type != Lexer::TokenType::Semicolon) {
+                elsestmt->body.push_back(parse_stmt());
+            }
+
+            expect(Lexer::TokenType::Semicolon, "Expected semicolon after single-line `else` statement.");
+        }
+
+        ifstmt->elseStmt = elsestmt;
+    }
+
     return ifstmt;
 }
 

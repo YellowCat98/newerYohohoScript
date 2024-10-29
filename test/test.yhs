@@ -1,9 +1,9 @@
-var x = 5;
-
-var y = x + 10;
-
-var condition = false;
-
-if condition {
-    print(y + 100)
+fun main() {
+    if true {
+        print(5)
+    } else {
+        print(12)
+    }
 }
+
+main()

@@ -116,14 +116,32 @@ values::RuntimeVal* interpreter::evaluate_fun_declaration(AST::FunDeclare* decla
 values::RuntimeVal* interpreter::evaluate_if_statement(AST::IfStmt* ifstmt, Environment* env) {
     bool condition = dynamic_cast<values::BoolVal*>(evaluate(ifstmt->condition, env))->value;
 
-    if (condition) {
-        values::RuntimeVal* lastEvaluated;
-        for (auto& stmt : ifstmt->body) {
-            lastEvaluated = evaluate(stmt, env);
+    bool hasElse = ifstmt->elseStmt.has_value();
+
+    values::RuntimeVal* lastEvaluated = new values::RuntimeVal();
+
+    if (!hasElse) {
+        if (condition) {
+            for (auto& stmt : ifstmt->body) {
+                lastEvaluated = evaluate(stmt, env);
+            }
+            return lastEvaluated;
         }
-        return lastEvaluated;
+    } else {
+        if (condition) {
+            for (auto& stmt : ifstmt->body) {
+                lastEvaluated = evaluate(stmt, env);
+            }
+            return lastEvaluated;
+        } else {
+            for (auto& stmt : ifstmt->elseStmt.value()->body) {
+                lastEvaluated = evaluate(stmt, env);
+            }
+            return lastEvaluated;
+        }
     }
-    return new values::RuntimeVal();
+
+    return lastEvaluated;
 }
 
 values::RuntimeVal* interpreter::evaluate(AST::Stmt* astNode, Environment* env) {

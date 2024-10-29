@@ -141,7 +141,7 @@ namespace frontend {
             AST::Expr* condition;
             bool multiline;
             std::deque<AST::Stmt*> body;
-            std::optional<AST::ElseStmt*> elseBody;
+            std::optional<AST::ElseStmt*> elseStmt;
         };
     };
 }
