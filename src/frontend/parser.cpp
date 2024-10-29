@@ -171,11 +171,11 @@ AST::Expr* Parser::parse_multiplicative_expr() {
 }
 
 AST::Expr* Parser::parse_comparison_expr() {
-    auto left = parse_additive_expr();
+    auto left = parse_assignment_expr();
 
     while (at()->type == Lexer::TokenType::ComparisonOp) {
         auto op = eat()->value;
-        auto right = parse_additive_expr();
+        auto right = parse_assignment_expr();
 
         auto binop = new AST::CompEx(); // using a binaryexpr because its the same exact thing lol!;
         binop->left = left;

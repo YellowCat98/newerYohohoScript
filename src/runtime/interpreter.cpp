@@ -21,7 +21,7 @@ values::NumVal* interpreter::evaluate_numeric_binary_expr(values::NumVal* lhs, v
     if (op == "+") result = lhs->value + rhs->value; else
     if (op == "-") result = lhs->value - rhs->value; else
     if (op == "*") result = lhs->value * rhs->value; else
-    if (op == "/") result = lhs->value / rhs->value; else // TODO: handle division by 0
+    if (op == "/") result = lhs->value / rhs->value; else
     result = lhs->value % rhs->value;
 
     auto returnvalue = new values::NumVal();
@@ -87,18 +87,19 @@ values::RuntimeVal* interpreter::evaluate_call_expr(AST::CallExpr* expr, Environ
         return result;
     }
 
-    throw std::invalid_argument("Interpreter: Cannot call value that is not a function.");
+    throw std::runtime_error("Interpreter: Cannot call value that is not a function.");
 }
 
 values::RuntimeVal* interpreter::evaluate_var_declaration(AST::VarDeclare* declaration, Environment* env) {
-    auto value = declaration->value ? evaluate(*declaration->value, env) : utils::MK_NULL();
+    auto value = declaration->value ? evaluate(declaration->value.value(), env) : utils::MK_NULL();
     return env->declareVar(declaration->identifier, value, declaration->constant);
 }
 
 values::RuntimeVal* interpreter::evaluate_assignment(AST::AssignExpr* node, Environment* env) {
     if (node->assigne->kind != AST::NodeType::Identifier) {
-        throw std::invalid_argument(fmt::format("Invalid LHS in assignment expression."));
+        throw std::runtime_error(fmt::format("Invalid LHS in assignment expression."));
     }
+    fmt::print("assigning");
     auto name = dynamic_cast<AST::Identifier*>(node->assigne)->symbol;
     return env->assignVar(name, evaluate(node->value, env));
 }
@@ -148,12 +149,13 @@ values::RuntimeVal* interpreter::evaluate_comparison_expr(AST::CompEx* compEx, E
     auto left = dynamic_cast<values::NumVal*>(evaluate(compEx->left, env));
     auto right = dynamic_cast<values::NumVal*>(evaluate(compEx->right, env));
 
-    if (compEx->op == "<") return utils::MK_BOOL(left->value < right->value); else
-    if (compEx->op == ">") return utils::MK_BOOL(left->value > right->value); else
-    if (compEx->op == "==") return utils::MK_BOOL(left->value == right->value);
+    bool result;
 
-    // this code most likely will NEVER be reached. but im only adding it so the compiler shuts up
-    throw std::invalid_argument("There was an unknown error evaluating comparison expression.");
+    if (compEx->op == "<") result = left->value < right->value; else
+    if (compEx->op == ">") result = left->value > right->value; else
+    if (compEx->op == "==") result = left->value == right->value;
+
+    return utils::MK_BOOL(result);
 }
 
 values::RuntimeVal* interpreter::evaluate(AST::Stmt* astNode, Environment* env) {

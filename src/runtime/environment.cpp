@@ -58,9 +58,9 @@ values::RuntimeVal* Environment::declareVar(const std::string& name, values::Run
 values::RuntimeVal* Environment::assignVar(const std::string& name, values::RuntimeVal* value) {
     auto env = this->resolve(name);
     if (env->constants.find(name) != env->constants.end()) {
-        throw std::invalid_argument(fmt::format("Cannot reassign to {} as it is constant.", name));
+        throw std::runtime_error(fmt::format("Cannot reassign to {} as it is constant.", name));
     }
-    env->variables.insert({name, value});
+    env->variables[name] = value;
     return value;
 }
 
