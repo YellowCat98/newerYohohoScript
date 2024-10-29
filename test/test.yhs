@@ -1,5 +1,8 @@
 fun main() {
-    var x = 5;
+	var x = 5;
+	if 5 <= 1 {
+		print(5)
+	}
 }
 
 main()

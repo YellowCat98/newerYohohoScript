@@ -39,14 +39,15 @@ namespace frontend {
         struct Token {
             std::string value;
             TokenType type;
-            Token(std::string value, TokenType type) : value(value), type(type) {}
+            int position;
+            Token(std::string value, TokenType type, int position) : value(value), type(type), position(position) {}
 
         };
 
         std::deque<Token*> tokenize(const std::string& sourceCode);
     private:
-        Token* token(std::string value, TokenType type) {
-            return new Token(value, type);
+        Token* token(std::string value, int position, TokenType type) {
+            return new Token(value, type, position);
         }
 
         std::unordered_map<std::string, Lexer::TokenType> RESERVED = {

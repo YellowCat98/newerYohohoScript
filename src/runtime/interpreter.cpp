@@ -153,7 +153,9 @@ values::RuntimeVal* interpreter::evaluate_comparison_expr(AST::CompEx* compEx, E
 
     if (compEx->op == "<") result = left->value < right->value; else
     if (compEx->op == ">") result = left->value > right->value; else
-    if (compEx->op == "==") result = left->value == right->value;
+    if (compEx->op == "==") result = left->value == right->value; else
+    if (compEx->op == ">=") result = left->value >= right->value; else
+    if (compEx->op == "<=") result = left->value <= right->value;
 
     return utils::MK_BOOL(result);
 }

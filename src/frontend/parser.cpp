@@ -48,7 +48,7 @@ AST::Expr* Parser::parse_primary_expr() {
             return value;
         }
         default: {
-            std::cout << "Parser: unexpected token found: " << at()->value << std::endl;
+            std::cout << "Parser: unexpected token found: " << at()->value << " at position " << at()->position << std::endl;
             exit(1);
         }
     }
