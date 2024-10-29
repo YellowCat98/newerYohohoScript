@@ -9,7 +9,36 @@ std::deque<Lexer::Token*> Lexer::tokenize(const std::string& sourceCode) {
     std::transform(sourceCode.begin(), sourceCode.end(), std::back_inserter(src),
                     [](char ch) { return std::string(1, ch); });
 
+    auto skipComments = [&src]() {
+        while (!src.empty()) {
+            if (src.size() >= 2 && src[0] == "/" && src[1] == "/") {
+                while (!src.empty() && src[0] != "\n") {
+                    src.pop_front();
+                }
+                if (!src.empty()) {
+                    src.pop_front();
+                }
+            } else if (src.size() >= 2 && src[0] == "/" && src[1] == "*") {
+                src.pop_front();
+                src.pop_front();
+                while (src.size() >= 2 && !(src[0] == "*" && src[1] == "/")) {
+                    src.pop_front();
+                }
+                if (src.size() >= 2) {
+                    src.pop_front();
+                    src.pop_front();
+                }
+            } else {
+                break;
+            }
+        }
+    };
+
     while (src.size() > 0) {
+        skipComments();
+
+        if (src.empty()) break;
+        
         if (src[0] == "(") {
             tokens.push_back(token(src.front(), TokenType::OpenParen));
             src.pop_front();
@@ -74,7 +103,7 @@ std::deque<Lexer::Token*> Lexer::tokenize(const std::string& sourceCode) {
                 }
             } else if (utils::isSkippable(src[0])) {
                 src.pop_front();
-            } else{
+            } else {
                 std::cout << "Lexer: unrecognized token found: " << src[0];
                 exit(1);
             }

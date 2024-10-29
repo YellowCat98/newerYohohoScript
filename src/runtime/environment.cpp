@@ -17,7 +17,19 @@ Environment* Environment::setupEnv() {
             }
         }
 
-        return utils::MK_NULL();
+        return new values::RuntimeVal();
+    }), true);
+
+    env->declareVar("free", utils::MK_NATIVE_FN([](std::deque<values::RuntimeVal*> args, Environment* scope) -> values::RuntimeVal* {
+        for (auto& arg : args) {
+            delete arg;
+        }
+        return new values::RuntimeVal();
+    }), true);
+
+    env->declareVar("throw", utils::MK_NATIVE_FN([](std::deque<values::RuntimeVal*> args, Environment* scope) -> values::RuntimeVal* {
+        throw std::invalid_argument(std::to_string(dynamic_cast<values::NumVal*>(args[0])->value));
+        return new values::RuntimeVal();
     }), true);
 
     return env;
