@@ -58,7 +58,7 @@ std::deque<Lexer::Token*> Lexer::tokenize(const std::string& sourceCode) {
         else if (src[0] == "[") {
             tokens.push_back(token(src.front(), TokenType::OpenBrack));
             src.pop_front();
-        }else if (src[0] == "]") {
+        } else if (src[0] == "]") {
             tokens.push_back(token(src.front(), TokenType::OpenBrack));
             src.pop_front();
         }

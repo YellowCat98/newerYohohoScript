@@ -32,8 +32,10 @@ namespace frontend {
             Fun, // 16
             If, // 17
             Else, // 18
-            Null, // 19
-            EOF_, // 20
+            GreaterThan, // 19
+            LessThan, // 20
+            Null, // 21
+            EOF_, // 22
         };
         struct Token {
             std::string value;

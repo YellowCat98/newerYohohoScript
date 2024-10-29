@@ -1,9 +1,10 @@
 fun main() {
+    var x = false;
     if true {
-        print(5)
-    } else {
-        print(12)
-    }
+        print(800)
+    } else if false {
+        print(777)
+    };
 }
 
 main()
