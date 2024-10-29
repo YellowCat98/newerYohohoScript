@@ -20,8 +20,7 @@ Lexer::Token* Parser::expect(Lexer::TokenType type,  std::string err) {
     auto prev = tokens.front();
     tokens.pop_front();
     if (prev->type != type) {
-        std::cout << "Parser Error: " << err << std::endl;
-        exit(1);
+        throw std::invalid_argument(fmt::format("Parser Error: {}", err));
     }
 
     return prev;
@@ -45,7 +44,7 @@ AST::Expr* Parser::parse_primary_expr() {
         case Lexer::TokenType::OpenParen: {
             eat();
             auto value = this->parse_expr();
-            expect(Lexer::TokenType::CloseParen, "Unexpected Token found, expected: ");
+            expect(Lexer::TokenType::CloseParen, "Unexpected Token found, expected closing parenthesis.");
             return value;
         }
         default: {
@@ -153,8 +152,6 @@ AST::Expr* Parser::parse_member_expr() {
     return object;
 }
 
-
-
 AST::Expr* Parser::parse_multiplicative_expr() {
     auto left = this->parse_call_member_expr();
 
@@ -168,6 +165,23 @@ AST::Expr* Parser::parse_multiplicative_expr() {
         left = binop;
 
         
+    }
+
+    return left;
+}
+
+AST::Expr* Parser::parse_comparison_expr() {
+    auto left = parse_additive_expr();
+
+    while (at()->type == Lexer::TokenType::ComparisonOp) {
+        auto op = eat()->value;
+        auto right = parse_additive_expr();
+
+        auto binop = new AST::CompEx(); // using a binaryexpr because its the same exact thing lol!;
+        binop->left = left;
+        binop->right = right;
+        binop->op = op;
+        left = binop;
     }
 
     return left;
@@ -249,7 +263,7 @@ AST::Stmt* Parser::parse_fun_declaration() {
 
     std::deque<AST::Stmt*> body;
 
-    while (at()->type != Lexer::TokenType::EOF_  && at()->type != Lexer::TokenType::CloseBrace) {
+    while (at()->type != Lexer::TokenType::EOF_ && at()->type != Lexer::TokenType::CloseBrace) {
         body.push_back(parse_stmt());
     }
 
@@ -262,7 +276,7 @@ AST::Stmt* Parser::parse_fun_declaration() {
 }
 
 AST::Expr* Parser::parse_expr() {
-    return this->parse_assignment_expr();
+    return this->parse_comparison_expr();
 }
 
 AST::Stmt* Parser::parse_var_declaration() {

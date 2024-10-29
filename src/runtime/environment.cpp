@@ -14,6 +14,13 @@ Environment* Environment::setupEnv() {
         for (auto& arg : args) {
             if (arg->type == values::ValueType::Number) {
                 std::cout << dynamic_cast<values::NumVal*>(arg)->value;
+            } else if (arg->type == values::ValueType::Boolean) {
+                auto boolthing = dynamic_cast<values::BoolVal*>(arg)->value;
+                if (boolthing) {
+                    std::cout << "true";
+                } else {
+                    std::cout << "false";
+                }
             }
         }
 

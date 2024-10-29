@@ -1,10 +1,8 @@
+
 fun main() {
-    var x = false;
-    if true {
-        print(800)
-    } else if false {
-        print(777)
-    };
+    if 1 == 1 {
+
+    }
 }
 
 main()

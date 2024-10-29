@@ -72,22 +72,24 @@ int main(int argc, const char* argv[]) {
 
     auto env = runtime::Environment::setupEnv();
 
-    //env->declareVar("x", utils::MK_NUM(500));
-
     auto interpreter = new runtime::interpreter();
     try {
+        ///*
         auto program = parser->produceAST(source);
         auto evaluated = interpreter->evaluate(program, env);
-
-        //auto lexer = new Lexer();
-        //auto tokens = lexer->tokenize(source);
-        //for (auto& token : tokens) {
-        //    fmt::print("{}", rift::format("type: {type}, value: {value}\ndata values: {data_values}\n\n--------------\n", {
-        //        {"type", rift::Value::from(static_cast<int>(token->type))},
-        //        {"value", rift::Value::from(token->value)},
-        //        {"data_values", rift::Value::from(createThing(token->value))}
-        //    }));
-        //}
+        //*/
+        /*
+        auto lexer = new Lexer();
+        auto tokens = lexer->tokenize(source);
+        for (auto& token : tokens) {
+            fmt::print("{}", rift::format("type: {type}, value: {value}\ndata values: {data_values}\n\n--------------\n", {
+                {"type", rift::Value::from(static_cast<int>(token->type))},
+                {"value", rift::Value::from(token->value)},
+                {"data_values", rift::Value::from(createThing(token->value))}
+            }));
+        }
+        */
+        // since when can you comment multiline comments????
 
     } catch (std::invalid_argument& e) {
         fmt::print("{}", e.what());

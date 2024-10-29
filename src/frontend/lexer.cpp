@@ -67,8 +67,14 @@ std::deque<Lexer::Token*> Lexer::tokenize(const std::string& sourceCode) {
             tokens.push_back(token(src.front(), TokenType::BinOp));
             src.pop_front();
         } else if (src[0] == "=") {
-            tokens.push_back(token(src.front(), TokenType::Equals));
-            src.pop_front();
+            if (src[1] == "=") {
+                tokens.push_back(token(src[0] + src[1], TokenType::ComparisonOp));
+                src.pop_front();
+                src.pop_front();
+            } else {
+                tokens.push_back(token(src.front(), TokenType::Equals));
+                src.pop_front();
+            }
         } else if (src[0] == ";") {
             tokens.push_back(token(src.front(), TokenType::Semicolon));
             src.pop_front();
@@ -80,6 +86,9 @@ std::deque<Lexer::Token*> Lexer::tokenize(const std::string& sourceCode) {
             src.pop_front();
         } else if (src[0] == ".") {
             tokens.push_back(token(src.front(), TokenType::Dot));
+            src.pop_front();
+        } else if (src[0] == ">" || src[0] == "<") {
+            tokens.push_back(token(src.front(), TokenType::ComparisonOp));
             src.pop_front();
         } else {
             if (utils::isInt(src[0])) {

@@ -16,8 +16,9 @@ namespace frontend {
             MemberExpr, // 8
             CallExpr, // 9
             FunctionDeclaration, // 10
-            If,
-            Else
+            If, // 11
+            Else, // 12
+            CompExpr // 13
         };
 
         struct Stmt {
@@ -143,5 +144,7 @@ namespace frontend {
             std::deque<AST::Stmt*> body;
             std::optional<AST::ElseStmt*> elseStmt;
         };
+
+        struct CompEx : public BinEx {CompEx(){kind=AST::NodeType::CompExpr;}}; // quite literally the same exact as BinEx, but uses kind = CompEx; so i can evaluate it like every other value
     };
 }

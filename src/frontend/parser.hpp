@@ -27,7 +27,7 @@ namespace frontend {
         AST::Expr* parse_member_expr();
         AST::Stmt* parse_fun_declaration();
         AST::Stmt* parse_if_condition();
-        AST::Stmt* parse_comparison();
+        AST::Expr* parse_comparison_expr();
         Lexer::Token* eat();
         Lexer::Token* at();
         Lexer::Token* expect(Lexer::TokenType type, std::string err);

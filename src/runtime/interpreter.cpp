@@ -37,7 +37,7 @@ values::RuntimeVal* interpreter::evaluate_binary_expr(AST::BinEx* binop, Environ
         return evaluate_numeric_binary_expr(dynamic_cast<values::NumVal*>(lhs), dynamic_cast<values::NumVal*>(rhs), binop->op);
     }
 
-    return new values::NullVal();
+    return new values::RuntimeVal();
 }
 
 values::RuntimeVal* interpreter::evaluate_identifier(AST::Identifier* ident, Environment* env) {
@@ -144,6 +144,18 @@ values::RuntimeVal* interpreter::evaluate_if_statement(AST::IfStmt* ifstmt, Envi
     return lastEvaluated;
 }
 
+values::RuntimeVal* interpreter::evaluate_comparison_expr(AST::CompEx* compEx, Environment* env) {
+    auto left = dynamic_cast<values::NumVal*>(evaluate(compEx->left, env));
+    auto right = dynamic_cast<values::NumVal*>(evaluate(compEx->right, env));
+
+    if (compEx->op == "<") return utils::MK_BOOL(left->value < right->value); else
+    if (compEx->op == ">") return utils::MK_BOOL(left->value > right->value); else
+    if (compEx->op == "==") return utils::MK_BOOL(left->value == right->value);
+
+    // this code most likely will NEVER be reached. but im only adding it so the compiler shuts up
+    throw std::invalid_argument("There was an unknown error evaluating comparison expression.");
+}
+
 values::RuntimeVal* interpreter::evaluate(AST::Stmt* astNode, Environment* env) {
     switch (astNode->kind) {
         case AST::NodeType::NumericLiteral: {
@@ -177,6 +189,9 @@ values::RuntimeVal* interpreter::evaluate(AST::Stmt* astNode, Environment* env) 
         }
         case AST::NodeType::If: {
             return evaluate_if_statement(dynamic_cast<AST::IfStmt*>(astNode), env);
+        }
+        case AST::NodeType::CompExpr: {
+            return evaluate_comparison_expr(dynamic_cast<AST::CompEx*>(astNode), env);
         }
         default: {
             std::cout << "Interpreter: This AST has not been yet setup for interpretation." << std::endl; // message mainly for things that i havent implemented in the interpreter yet.
