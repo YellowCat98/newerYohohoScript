@@ -113,6 +113,19 @@ values::RuntimeVal* interpreter::evaluate_fun_declaration(AST::FunDeclare* decla
     return env->declareVar(declaration->name, fn, true);
 }
 
+values::RuntimeVal* interpreter::evaluate_if_statement(AST::IfStmt* ifstmt, Environment* env) {
+    bool condition = dynamic_cast<values::BoolVal*>(evaluate(ifstmt->condition, env))->value;
+
+    if (condition) {
+        values::RuntimeVal* lastEvaluated;
+        for (auto& stmt : ifstmt->body) {
+            lastEvaluated = evaluate(stmt, env);
+        }
+        return lastEvaluated;
+    }
+    return new values::RuntimeVal();
+}
+
 values::RuntimeVal* interpreter::evaluate(AST::Stmt* astNode, Environment* env) {
     switch (astNode->kind) {
         case AST::NodeType::NumericLiteral: {
@@ -143,6 +156,9 @@ values::RuntimeVal* interpreter::evaluate(AST::Stmt* astNode, Environment* env) 
         }
         case AST::NodeType::FunctionDeclaration: {
             return evaluate_fun_declaration(dynamic_cast<AST::FunDeclare*>(astNode), env);
+        }
+        case AST::NodeType::If: {
+            return evaluate_if_statement(dynamic_cast<AST::IfStmt*>(astNode), env);
         }
         default: {
             std::cout << "Interpreter: This AST has not been yet setup for interpretation." << std::endl; // message mainly for things that i havent implemented in the interpreter yet.

@@ -1,7 +1,9 @@
-fun main() {
-    if true {
-        print(5)
-    }
-}
+var x = 5;
 
-main()
+var y = x + 10;
+
+var condition = false;
+
+if condition {
+    print(y + 100)
+}

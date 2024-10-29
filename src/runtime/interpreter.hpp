@@ -16,6 +16,7 @@ namespace runtime {
         values::RuntimeVal* evaluate_object_expr(frontend::AST::ObjectLiteral* obj, Environment* env);
         values::RuntimeVal* evaluate_call_expr(frontend::AST::CallExpr* expr, Environment* env);
         values::RuntimeVal* evaluate_fun_declaration(frontend::AST::FunDeclare* declaration, Environment* env);
+        values::RuntimeVal* evaluate_if_statement(frontend::AST::IfStmt* ifstmt, Environment* env);
     public:
         interpreter() {}
         values::RuntimeVal* evaluate(frontend::AST::Stmt* astNode, Environment* env);
