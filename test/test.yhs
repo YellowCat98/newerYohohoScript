@@ -1,6 +1,1 @@
-fun main() {
-	var y = "hello, world!\n";
-	print("5 == 5")
-}
-
-main()
+print("Hello, World!")
