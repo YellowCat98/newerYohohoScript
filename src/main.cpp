@@ -80,7 +80,7 @@ int main(int argc, const char* argv[]) {
         //*/
         /*
         auto lexer = new Lexer();
-        auto tokens = lexer->tokenize(source);
+        auto tokens = lexer->tokenize(source->contents);
         for (auto& token : tokens) {
             fmt::print("{}", rift::format("type: {type}, value: {value}\ndata values: {data_values}\n\n--------------\n", {
                 {"type", rift::Value::from(static_cast<int>(token->type))},

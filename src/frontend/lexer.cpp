@@ -34,12 +34,64 @@ std::deque<Lexer::Token*> Lexer::tokenize(const std::string& sourceCode) {
         }
     };
 
+    // we are parsing strings within the lexer, but then later storing it in the AST.
+
+    auto handleEscapeSequence = [&src]() -> std::string {
+        src.pop_front();
+        if (src.empty()) return "";
+
+        char escapedChar = src.front()[0];
+        src.pop_front();
+
+        switch (escapedChar) {
+            case 'n': return "\n";
+            case 't': return "\t";
+            case '\"': return "\"";
+            case '\\': return "\\";
+            case '\'': return "\'";
+            case 'b': return "\b";
+            case 'f': return "\f";
+            case 'r': return "\r";
+            case 'v': return "\v";
+            case 'a': return "\a";
+            case '0': return "\0";
+
+            default: return std::string(1, escapedChar);
+        }
+    };
+
+    auto parseStringLiteral = [&src, &handleEscapeSequence]() -> std::string {
+        std::string strLiteral;
+        src.pop_front();
+
+        while (!src.empty() && src[0] != "\"") {
+            if (src[0] == "\\") {
+                strLiteral += handleEscapeSequence();
+            } else {
+                strLiteral += src[0];
+                src.pop_front();
+            }
+        }
+
+        if (!src.empty() && src[0] == "\"") {
+            src.pop_front();
+        } else {
+            throw std::invalid_argument("Lexer: Unterminated string literal.");
+        }
+
+        return strLiteral;
+    };
+
     int line = 1;
 
     while (src.size() > 0) {
         skipComments();
 
         if (src.empty()) break;
+
+        if (src[0] == "\"") {
+            tokens.push_back(token(parseStringLiteral(), line, TokenType::String));
+        }
         
         if (src[0] == "(") {
             tokens.push_back(token(src.front(), line, TokenType::OpenParen));
