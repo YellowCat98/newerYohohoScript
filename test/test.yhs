@@ -1,11 +1,6 @@
-fun test() {
-	var x = 5;
-}
-
 fun main() {
-	print(test())
+	var y = "hello, world!\n";
+	print(y, 2)
 }
 
 main()
-
-"#include <Geode/Geode.hpp>\n\nusing namespace geode::prelude;\n\nclass $modify(MenuLayer) {\n\tvoid onMoreGames(CCObject*) {\n\t\tlog::info(\"HI!\")\n\t}\n}"

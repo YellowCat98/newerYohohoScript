@@ -21,6 +21,8 @@ Environment* Environment::setupEnv() {
                 } else {
                     std::cout << "false";
                 }
+            } else if (arg->type == values::ValueType::String) {
+                std::cout << dynamic_cast<values::StringVal*>(arg)->value;
             }
         }
 

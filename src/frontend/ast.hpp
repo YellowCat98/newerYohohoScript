@@ -18,7 +18,8 @@ namespace frontend {
             FunctionDeclaration, // 10
             If, // 11
             Else, // 12
-            CompExpr // 13
+            CompExpr, // 13
+            StringLiteral // 14
         };
 
         struct Stmt {
@@ -145,5 +146,13 @@ namespace frontend {
         };
 
         struct CompEx : public BinEx {CompEx(){kind=AST::NodeType::CompExpr;}}; // quite literally the same exact as BinEx, but uses kind = CompEx; so i can evaluate it like every other value
+
+        struct StringLiteral : public Expr {
+            StringLiteral() {
+                this->kind = NodeType::StringLiteral;
+            }
+
+            std::string value;
+        };
     };
 }

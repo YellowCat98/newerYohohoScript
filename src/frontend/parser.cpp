@@ -269,8 +269,21 @@ AST::Stmt* Parser::parse_fun_declaration() {
     return fn;
 }
 
+AST::Expr* Parser::parse_string() {
+    auto val = new AST::StringLiteral();
+    val->value = eat()->value;
+    return val;
+}
+
 AST::Expr* Parser::parse_expr() {
-    return this->parse_comparison_expr();
+    switch (at()->type) {
+        case Lexer::TokenType::String: {
+            return this->parse_string();
+        }
+        default: {
+            return this->parse_comparison_expr();
+        }
+    }
 }
 
 AST::Stmt* Parser::parse_var_declaration() {
