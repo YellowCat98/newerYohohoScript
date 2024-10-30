@@ -107,13 +107,12 @@ std::deque<AST::Expr*> Parser::parse_args() {
 std::deque<AST::Expr*> Parser::parse_arguments_list() {
     std::deque<AST::Expr*> args;
 
-    while (notEOF()) {
-        if (at()->type == Lexer::TokenType::Comma) {
-            eat();
-        } else if (at()->type == Lexer::TokenType::CloseParen) {
-            break;
-        } else {
-            args.push_back(parse_assignment_expr());
+    while (notEOF() && at()->type != Lexer::TokenType::CloseParen) {
+        args.push_back(parse_comparison_expr());
+        if (at()->type == Lexer::TokenType::Comma) { 
+                eat(); 
+        } else if (at()->type != Lexer::TokenType::CloseParen) {
+            throw std::invalid_argument("Parser: Expected comma or closing parenthesis ");
         }
     }
 
@@ -136,10 +135,9 @@ AST::Expr* Parser::parse_member_expr() {
         
 
         auto memberExpr = new AST::MemberExpr();
-        memberExpr->object = object; // Set the previous object as the base
-        memberExpr->property = property; // Set the property to the current identifier
+        memberExpr->object = object;
+        memberExpr->property = property;
 
-        // The current object becomes the new member expression for the next iteration
         object = memberExpr;
     }
 
