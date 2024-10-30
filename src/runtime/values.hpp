@@ -16,7 +16,8 @@ namespace runtime {
             Boolean, // 2
             Object, // 3
             NativeFn, // 4
-            Function // 5
+            Function, // 5
+            String, // 6
         };
 
         struct RuntimeVal {
@@ -77,6 +78,12 @@ namespace runtime {
             std::deque<std::string> params;
             Environment* decEnv;
             std::deque<frontend::AST::Stmt*> body;
+        };
+
+        struct StringVal : public RuntimeVal {
+            StringVal() {type = ValueType::String;}
+
+            std::string value;
         };
     };
 }
