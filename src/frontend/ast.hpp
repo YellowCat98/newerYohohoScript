@@ -112,7 +112,6 @@ namespace frontend {
             }
             Expr* object;
             Expr* property;
-            bool computed;
         };
 
         struct FunDeclare : public Stmt {

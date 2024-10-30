@@ -48,7 +48,7 @@ AST::Expr* Parser::parse_primary_expr() {
             return value;
         }
         default: {
-            throw std::runtime_error(fmt::format("{}:{}: Unexpected token found: {}", fileName, at()->position, at()->value));
+            throw std::runtime_error(fmt::format("{}:{}: Unexpected token found: '{}'", fileName, at()->position, at()->value));
         }
     }
 }
@@ -123,29 +123,24 @@ std::deque<AST::Expr*> Parser::parse_arguments_list() {
 AST::Expr* Parser::parse_member_expr() {
     auto object = parse_primary_expr();
 
-    while (at()->type == Lexer::TokenType::Dot || at()->type == Lexer::TokenType::OpenBrack) {
+    while (at()->type == Lexer::TokenType::Dot) {
         auto op = eat();
 
         AST::Expr* property;
-        bool computed;
 
-        if (op->type == Lexer::TokenType::Dot) {
-            computed = false;
-            property = parse_primary_expr();
+        property = parse_primary_expr();
 
-            if (property->kind != AST::NodeType::Identifier) {
-                throw std::invalid_argument("RHS is not an identifier.");
-            }
-        } else {
-            computed = true;
-            property = parse_expr();
-            expect(Lexer::TokenType::CloseBrack, "Missing closing bracket.");
+        if (property->kind != AST::NodeType::Identifier) {
+            throw std::invalid_argument("RHS is not an identifier.");
         }
+        
 
-        object = new AST::MemberExpr();
-        dynamic_cast<AST::MemberExpr*>(object)->object = object;
-        dynamic_cast<AST::MemberExpr*>(object)->property = property;
-        dynamic_cast<AST::MemberExpr*>(object)->computed = computed;
+        auto memberExpr = new AST::MemberExpr();
+        memberExpr->object = object; // Set the previous object as the base
+        memberExpr->property = property; // Set the property to the current identifier
+
+        // The current object becomes the new member expression for the next iteration
+        object = memberExpr;
     }
 
     return object;
@@ -176,7 +171,7 @@ AST::Expr* Parser::parse_comparison_expr() {
         auto op = eat()->value;
         auto right = parse_assignment_expr();
 
-        auto binop = new AST::CompEx(); // using a binaryexpr because its the same exact thing lol!;
+        auto binop = new AST::CompEx();
         binop->left = left;
         binop->right = right;
         binop->op = op;

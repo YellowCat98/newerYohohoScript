@@ -97,6 +97,9 @@ int main(int argc, const char* argv[]) {
     } catch (std::runtime_error& e) {
         fmt::print("{}", e.what());
         return 1;
+    } catch (...) {
+        fmt::print("An unknown error has ocurred.");
+        return 1;
     }
 
     return 0;

@@ -159,6 +159,30 @@ values::RuntimeVal* interpreter::evaluate_comparison_expr(AST::CompEx* compEx, E
     return utils::MK_BOOL(result);
 }
 
+values::RuntimeVal* interpreter::evaluate_member_expr(AST::MemberExpr* member, Environment* env) {
+    auto objectVal = evaluate(member->object, env);
+
+    auto propertyIdent = dynamic_cast<AST::Identifier*>(member->property);
+    if (!propertyIdent) {
+        throw std::runtime_error("Interpreter: Property in member expression is not an identifier.");
+    }
+    
+    auto propertyName = propertyIdent->symbol;
+
+    if (objectVal->type == values::ValueType::Object) {
+        auto object = dynamic_cast<values::ObjectVal*>(objectVal);
+
+        auto it = object->properties.find(propertyName);
+        if (it != object->properties.end()) {
+            return it->second;
+        } else {
+            throw std::runtime_error(fmt::format("Property '{}' does not exist on the object.", propertyName));
+        }
+    }
+
+    throw std::runtime_error("Interpreter: Attempted to access a member on a non-object type.");
+}
+
 values::RuntimeVal* interpreter::evaluate(AST::Stmt* astNode, Environment* env) {
     switch (astNode->kind) {
         case AST::NodeType::NumericLiteral: {
@@ -195,6 +219,9 @@ values::RuntimeVal* interpreter::evaluate(AST::Stmt* astNode, Environment* env) 
         }
         case AST::NodeType::CompExpr: {
             return evaluate_comparison_expr(dynamic_cast<AST::CompEx*>(astNode), env);
+        }
+        case AST::NodeType::MemberExpr: {
+            return evaluate_member_expr(dynamic_cast<AST::MemberExpr*>(astNode), env);
         }
         default: {
             std::cout << "Interpreter: This AST has not been yet setup for interpretation." << std::endl; // message mainly for things that i havent implemented in the interpreter yet.
