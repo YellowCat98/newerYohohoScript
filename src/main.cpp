@@ -94,6 +94,9 @@ int main(int argc, const char* argv[]) {
     } catch (std::invalid_argument& e) {
         fmt::print("{}", e.what());
         return 1;
+    } catch (std::runtime_error& e) {
+        fmt::print("{}", e.what());
+        return 1;
     }
 
     return 0;

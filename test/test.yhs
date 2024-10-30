@@ -8,7 +8,7 @@ fun main() {
 		var y = 12;
 		print(5)
 	}
-	print())
+	print(5 < 5)
 }
 
 main()

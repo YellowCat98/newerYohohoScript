@@ -48,8 +48,7 @@ AST::Expr* Parser::parse_primary_expr() {
             return value;
         }
         default: {
-            fmt::print("{}:{}: Unexpected token found: {}", fileName, at()->position, at()->value);
-            exit(1);
+            throw std::runtime_error(fmt::format("{}:{}: Unexpected token found: {}", fileName, at()->position, at()->value));
         }
     }
 }
