@@ -99,7 +99,6 @@ values::RuntimeVal* interpreter::evaluate_assignment(AST::AssignExpr* node, Envi
     if (node->assigne->kind != AST::NodeType::Identifier) {
         throw std::runtime_error(fmt::format("Invalid LHS in assignment expression."));
     }
-    fmt::print("assigning");
     auto name = dynamic_cast<AST::Identifier*>(node->assigne)->symbol;
     return env->assignVar(name, evaluate(node->value, env));
 }

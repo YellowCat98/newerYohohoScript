@@ -10,6 +10,7 @@ namespace frontend {
     private:
         Lexer* lexer;
         std::deque<Lexer::Token*> tokens;
+        std::string fileName;
 
         bool notEOF();
         AST::Stmt* parse_stmt();
@@ -35,7 +36,7 @@ namespace frontend {
     Parser() {
         lexer = new Lexer();
     }
-    AST::Program* produceAST(std::string const& source);
+    AST::Program* produceAST(utils::File* source);
 
     };
 }

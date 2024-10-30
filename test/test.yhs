@@ -1,8 +1,14 @@
+fun sigma(x) {
+	print(x)
+}
+
 fun main() {
 	var x = 5;
 	if 5 <= 1 {
+		var y = 12;
 		print(5)
 	}
+	print())
 }
 
 main()

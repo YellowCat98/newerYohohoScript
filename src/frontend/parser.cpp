@@ -48,7 +48,7 @@ AST::Expr* Parser::parse_primary_expr() {
             return value;
         }
         default: {
-            std::cout << "Parser: unexpected token found: " << at()->value << " at position " << at()->position << std::endl;
+            fmt::print("{}:{}: Unexpected token found: {}", fileName, at()->position, at()->value);
             exit(1);
         }
     }
@@ -377,8 +377,9 @@ AST::Stmt* Parser::parse_stmt() {
     }
 }
 
-AST::Program* Parser::produceAST(std::string const& sourceCode) {
-    this->tokens = lexer->tokenize(sourceCode);
+AST::Program* Parser::produceAST(utils::File* file) {
+    this->tokens = lexer->tokenize(file->contents);
+    this->fileName = file->name;
     auto program = new AST::Program();
 
     while (notEOF()) {

@@ -31,7 +31,7 @@ namespace runtime {
                 type = ValueType::Null;
             }
 
-            std::string value = "";
+            std::nullptr_t value = nullptr;
         };
 
         struct NumVal : public RuntimeVal {

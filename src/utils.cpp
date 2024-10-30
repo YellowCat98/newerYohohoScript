@@ -4,6 +4,8 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
+#include <filesystem>
+#include <fmt/core.h>
 #include "utils.hpp"
 
 namespace utils {
@@ -29,14 +31,15 @@ namespace utils {
         return str == "" || str == " " || str == "\n" || str == "\r" || str == "\t";
     }
 
-    std::string readFile(const std::string& filePath) {
+    File* readFile(const std::string& filePath) {
+        std::string fileName = std::filesystem::path(filePath).filename().string();
         std::ifstream file(filePath);
         if (!file.is_open()) {
-            return "";
+            return new File("", fileName);
         }
         std::stringstream buffer;
         buffer << file.rdbuf();
-        return buffer.str();
+        return new File(buffer.str(), fileName);
     }
 
     runtime::values::NumVal* MK_NUM(int value) {

@@ -8,7 +8,14 @@ namespace utils {
 
     bool isSkippable(const std::string& str);
 
-    std::string readFile(const std::string& filePath);
+
+    struct File {
+        std::string contents;
+        std::string name;
+        File(const std::string& contents, const std::string& name) : contents(contents), name(name) {}
+    };
+
+    File* readFile(const std::string& filePath);
 
     runtime::values::NumVal* MK_NUM(int value);
 
