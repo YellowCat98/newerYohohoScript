@@ -204,16 +204,18 @@ AST::Expr* Parser::parse_object_expr() {
 
     while (notEOF() && at()->type != Lexer::TokenType::CloseBrace) {
         auto key = this->expect(Lexer::TokenType::Identifier, "Expected identifier for object literal.")->value;
-        if (at()->type == Lexer::TokenType::Comma) {
-            eat();
+        if (at()->type == Lexer::TokenType::Comma || at()->type == Lexer::TokenType::CloseBrace) {
             auto property = new AST::Property();
             property->key = key;
+            auto ident = new AST::Identifier();
+            ident->symbol = key;
+            property->value = ident;
             properties.push_back(property);
             continue;
-        } else if (at()->type == Lexer::TokenType::CloseBrace) {
-            auto property = new AST::Property();
-            property->key = key;
-            properties.push_back(property);
+
+            if (at()->type == Lexer::TokenType::Comma) {
+                eat();
+            }
             continue;
         }
 

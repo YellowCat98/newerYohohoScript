@@ -1,13 +1,11 @@
-fun main() {
-    var x = 0;
-    while true {
-        x = x + 1
+var x = 5;
 
-        if x == 2147483645 {
-            break
-        }
-    }
-    print("End!")
+const obj = {
+    x
+};
+
+fun main() {
+    print(obj.x)
 }
 
 main()
