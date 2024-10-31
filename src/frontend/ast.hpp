@@ -146,7 +146,11 @@ namespace frontend {
             std::optional<AST::ElseStmt*> elseStmt;
         };
 
-        struct CompEx : public BinEx {CompEx(){kind=AST::NodeType::CompExpr;}}; // quite literally the same exact as BinEx, but uses kind = CompEx; so i can evaluate it like every other value
+        struct CompEx : public BinEx {
+            CompEx() {
+                kind=AST::NodeType::CompExpr;
+            }
+        };
 
         struct StringLiteral : public Expr {
             StringLiteral() {

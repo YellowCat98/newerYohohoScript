@@ -25,4 +25,12 @@ namespace utils {
 
     runtime::values::BoolVal* MK_BOOL(bool value);
     runtime::values::StringVal* MK_STRING(const std::string& value);
+
+    class Break : public std::exception {
+    public:
+        Break() {};
+        const char* what() const noexcept override {
+            return "";
+        }
+    };
 }

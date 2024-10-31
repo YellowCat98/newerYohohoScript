@@ -1,6 +1,9 @@
 fun main() {
-    var x = input("Name: ");
-    print("\nYour name is: ", x, "\n")
+    var x = "";
+    while true {
+        x = input("Enter a thing: ")
+        print("You entered: ", x, "\n")
+    }
 }
 
 main()
