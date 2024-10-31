@@ -41,6 +41,27 @@ Environment* Environment::setupEnv() {
         return new values::RuntimeVal();
     }), true);
 
+    env->declareVar("input", utils::MK_NATIVE_FN([](std::deque<values::RuntimeVal*> args, Environment* scope) -> values::RuntimeVal* {
+        std::string input;
+        for (auto& arg : args) {
+            if (arg->type == values::ValueType::Number) {
+                std::cout << dynamic_cast<values::NumVal*>(arg)->value;
+            } else if (arg->type == values::ValueType::Boolean) {
+                auto boolthing = dynamic_cast<values::BoolVal*>(arg)->value;
+                if (boolthing) {
+                    std::cout << "true";
+                } else {
+                    std::cout << "false";
+                }
+            } else if (arg->type == values::ValueType::String) {
+                std::cout << dynamic_cast<values::StringVal*>(arg)->value;
+            }
+        }
+        std::getline(std::cin, input);
+        return utils::MK_STRING(input);
+
+    }), true);
+
     return env;
 }
 

@@ -391,6 +391,12 @@ AST::Stmt* Parser::parse_while_statement() {
     return whilestmt;
 }
 
+AST::Stmt* Parser::parse_break_statement() {
+    eat();
+    auto stmt = new AST::BreakStmt();
+    return stmt;
+}
+
 AST::Stmt* Parser::parse_stmt() {
     switch (at()->type) {
         case Lexer::TokenType::Var: {
@@ -409,7 +415,7 @@ AST::Stmt* Parser::parse_stmt() {
             return this->parse_while_statement();
         }
         case Lexer::TokenType::Break: {
-            return new AST::BreakStmt();
+            return this->parse_break_statement();
         }
         default: {
             return this->parse_expr();

@@ -1,1 +1,6 @@
-print("Hello, World!")
+fun main() {
+    var x = input("Name: ");
+    print("\nYour name is: ", x, "\n")
+}
+
+main()

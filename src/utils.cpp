@@ -63,4 +63,10 @@ namespace utils {
         return_val->value = value;
         return return_val;
     }
+
+    runtime::values::StringVal* MK_STRING(const std::string& value) {
+        auto return_val = new runtime::values::StringVal();
+        return_val->value = value;
+        return return_val;
+    }
 }

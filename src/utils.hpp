@@ -24,4 +24,5 @@ namespace utils {
     runtime::values::NativeFnValue* MK_NATIVE_FN(runtime::values::FunctionCall call);
 
     runtime::values::BoolVal* MK_BOOL(bool value);
+    runtime::values::StringVal* MK_STRING(const std::string& value);
 }
