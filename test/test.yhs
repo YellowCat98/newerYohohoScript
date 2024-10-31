@@ -1,9 +1,13 @@
 fun main() {
-    var x = "";
+    var x = 0;
     while true {
-        x = input("Enter a thing: ")
-        print("You entered: ", x, "\n")
+        x = x + 1
+
+        if x == 2147483645 {
+            break
+        }
     }
+    print("End!")
 }
 
 main()

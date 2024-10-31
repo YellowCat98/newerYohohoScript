@@ -108,11 +108,7 @@ std::deque<AST::Expr*> Parser::parse_arguments_list() {
     std::deque<AST::Expr*> args;
 
     while (notEOF() && at()->type != Lexer::TokenType::CloseParen) {
-        if (at()->type == Lexer::TokenType::String) {
-            args.push_back(parse_string());
-        } else {
-            args.push_back(parse_comparison_expr());
-        }
+        args.push_back(this->parse_expr());
         if (at()->type == Lexer::TokenType::Comma) { 
             eat(); 
         } else if (at()->type != Lexer::TokenType::CloseParen) {
