@@ -1,1 +1,6 @@
-print("Hello, World!")
+fun main() {
+    while true {
+        break
+    }
+}
+

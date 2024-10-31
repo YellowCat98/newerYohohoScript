@@ -20,6 +20,7 @@ namespace runtime {
         values::RuntimeVal* evaluate_comparison_expr(frontend::AST::CompEx* compEx, Environment* env);
         values::RuntimeVal* evaluate_member_expr(frontend::AST::MemberExpr* member, Environment* env);
         values::RuntimeVal* evaluate_string(frontend::AST::StringLiteral* string, Environment* env);
+        values::RuntimeVal* evaluate_while_statement(frontend::AST::WhileStmt* whilestmt, Environment* env);
     public:
         interpreter() {}
         values::RuntimeVal* evaluate(frontend::AST::Stmt* astNode, Environment* env);

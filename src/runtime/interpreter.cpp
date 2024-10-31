@@ -189,6 +189,22 @@ values::RuntimeVal* interpreter::evaluate_string(AST::StringLiteral* string, Env
     return stringVal;
 }
 
+values::RuntimeVal* interpreter::evaluate_while_statement(AST::WhileStmt* whilestmt, Environment* env) {
+    auto lastEvaluated = new values::RuntimeVal(); // Initialize lastEvaluated to null
+
+    while (true) {
+        bool condition = dynamic_cast<values::BoolVal*>(evaluate(whilestmt->condition, env))->value;
+
+        if (!condition) break;
+
+        for (auto& stmt : whilestmt->body) {
+            lastEvaluated = evaluate(stmt, env);
+        }
+    }
+
+    return lastEvaluated;
+}
+
 values::RuntimeVal* interpreter::evaluate(AST::Stmt* astNode, Environment* env) {
     switch (astNode->kind) {
         case AST::NodeType::NumericLiteral: {
@@ -231,6 +247,9 @@ values::RuntimeVal* interpreter::evaluate(AST::Stmt* astNode, Environment* env) 
         }
         case AST::NodeType::StringLiteral: {
             return evaluate_string(dynamic_cast<AST::StringLiteral*>(astNode), env);
+        }
+        case AST::NodeType::While: {
+            return evaluate_while_statement(dynamic_cast<AST::WhileStmt*>(astNode), env);
         }
         default: {
             std::cout << "Interpreter: This AST has not been yet setup for interpretation." << std::endl; // message mainly for things that i havent implemented in the interpreter yet.

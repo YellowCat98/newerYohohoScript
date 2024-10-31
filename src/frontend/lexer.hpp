@@ -34,8 +34,10 @@ namespace frontend {
             Else, // 18
             ComparisonOp, // 19
             String, // 20
-            Null, // 21
-            EOF_, // 22
+            While, // 21
+            Break, // 22
+            Null, // 23
+            EOF_, // 24
         };
         struct Token {
             std::string value;
@@ -56,7 +58,9 @@ namespace frontend {
             {"const", Lexer::TokenType::Const},
             {"fun", Lexer::TokenType::Fun},
             {"if", Lexer::TokenType::If},
-            {"else", Lexer::TokenType::Else}
+            {"else", Lexer::TokenType::Else},
+            {"while", Lexer::TokenType::While},
+            {"break", Lexer::TokenType::Break}
         };
     };
 }

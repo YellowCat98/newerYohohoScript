@@ -19,7 +19,9 @@ namespace frontend {
             If, // 11
             Else, // 12
             CompExpr, // 13
-            StringLiteral // 14
+            StringLiteral, // 14
+            While, // 15
+            BreakStmt // 16
         };
 
         struct Stmt {
@@ -47,7 +49,6 @@ namespace frontend {
             std::optional<Expr*> value;
         };
 
-        
         struct BinEx : public Expr {
             BinEx() {
                 this->kind = NodeType::BinaryExpr;
@@ -153,6 +154,22 @@ namespace frontend {
             }
 
             std::string value;
+        };
+
+        struct WhileStmt : public Stmt {
+            WhileStmt() {
+                this->kind = NodeType::While;
+            }
+
+            AST::Expr* condition;
+            bool multiline;
+            std::deque<AST::Stmt*> body;
+        };
+
+        struct BreakStmt : public Stmt {
+            BreakStmt() {
+                this->kind = NodeType::BreakStmt;
+            }
         };
     };
 }

@@ -312,7 +312,7 @@ AST::Stmt* Parser::parse_var_declaration() {
 }
 
 AST::Stmt* Parser::parse_if_condition() {
-    eat(); // eat the if statement
+    eat(); // eat the if keyword
 
     auto ifstmt = new AST::IfStmt();
     ifstmt->condition = this->parse_expr();
@@ -330,7 +330,7 @@ AST::Stmt* Parser::parse_if_condition() {
     } else {
         ifstmt->multiline = false;
 
-        while (at()->type != Lexer::TokenType::EOF_ && at()->type != Lexer::TokenType::Semicolon) {
+        while (notEOF() && at()->type != Lexer::TokenType::Semicolon) {
             ifstmt->body.push_back(parse_stmt());
         }
 
@@ -345,7 +345,7 @@ AST::Stmt* Parser::parse_if_condition() {
             elsestmt->multiline = true;
             eat();
 
-            while (at()->type != Lexer::TokenType::EOF_ && at()->type != Lexer::TokenType::CloseBrace) {
+            while (notEOF() && at()->type != Lexer::TokenType::CloseBrace) {
                 elsestmt->body.push_back(parse_stmt());
             }
 
@@ -366,6 +366,31 @@ AST::Stmt* Parser::parse_if_condition() {
     return ifstmt;
 }
 
+AST::Stmt* Parser::parse_while_statement() {
+    eat(); // eat the while keyword
+
+    auto whilestmt = new AST::WhileStmt();
+    whilestmt->condition = this->parse_expr();
+
+    if (at()->type == Lexer::TokenType::OpenBrace) {
+        whilestmt->multiline = true;
+        eat();
+        while (notEOF() && at()->type != Lexer::TokenType::CloseBrace) {
+            whilestmt->body.push_back(parse_stmt());
+        }
+        expect(Lexer::TokenType::CloseBrace, "Expected closing Brace after while statement.");
+    } else {
+        whilestmt->multiline = false;
+
+        while (notEOF() && at()->type != Lexer::TokenType::Semicolon) {
+            whilestmt->body.push_back(parse_stmt());
+        }
+        expect(Lexer::TokenType::Semicolon, "Expected ';' after single-line while statement.");
+    }
+
+    return whilestmt;
+}
+
 AST::Stmt* Parser::parse_stmt() {
     switch (at()->type) {
         case Lexer::TokenType::Var: {
@@ -379,6 +404,12 @@ AST::Stmt* Parser::parse_stmt() {
         }
         case Lexer::TokenType::If: {
             return this->parse_if_condition();
+        }
+        case Lexer::TokenType::While: {
+            return this->parse_while_statement();
+        }
+        case Lexer::TokenType::Break: {
+            return new AST::BreakStmt();
         }
         default: {
             return this->parse_expr();
