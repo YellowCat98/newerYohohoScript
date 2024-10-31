@@ -61,7 +61,7 @@ std::string createThing(const std::string& str) {
 
 int main(int argc, const char* argv[]) {
     auto lex = new frontend::Lexer();
-    if (argc < 1) {
+    if (argc < 2) {
         std::cout << "Missing argument: <yhs file>" << std::endl;
         return 1;
     }
