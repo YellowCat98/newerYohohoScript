@@ -5,8 +5,8 @@
 using namespace runtime;
 using namespace frontend;
 
-values::RuntimeVal* interpreter::evaluate_program(AST::Program* program, Environment* env) {
-    values::RuntimeVal* lastEvaluated;
+std::unique_ptr<values::RuntimeVal> interpreter::evaluate_program(AST::Program* program, Environment* env) {
+    auto lastEvaluated = std::make_unique<values::RuntimeVal>();
 
     for (auto& statement : program->body) {
         lastEvaluated = evaluate(statement, env);
@@ -15,7 +15,7 @@ values::RuntimeVal* interpreter::evaluate_program(AST::Program* program, Environ
     return lastEvaluated;
 }
 
-values::NumVal* interpreter::evaluate_numeric_binary_expr(values::NumVal* lhs, values::NumVal* rhs, const std::string& op) {
+std::unique_ptr<values::NumVal> interpreter::evaluate_numeric_binary_expr(std::unique_ptr<values::NumVal> lhs, std::unique_ptr<values::NumVal> rhs, const std::string& op) {
     int result = 0;
 
     if (op == "+") result = lhs->value + rhs->value; else
@@ -24,34 +24,32 @@ values::NumVal* interpreter::evaluate_numeric_binary_expr(values::NumVal* lhs, v
     if (op == "/") result = lhs->value / rhs->value; else
     result = lhs->value % rhs->value;
 
-    delete lhs;
-    delete rhs;
 
-    auto returnvalue = new values::NumVal();
+    auto returnvalue = std::make_unique<values::NumVal>();
     returnvalue->value = result;
     return returnvalue;
 }
 
-values::RuntimeVal* interpreter::evaluate_binary_expr(AST::BinEx* binop, Environment* env) {
+std::unique_ptr<values::RuntimeVal> interpreter::evaluate_binary_expr(AST::BinEx* binop, Environment* env) {
     auto lhs = evaluate(binop->left, env);
     auto rhs = evaluate(binop->right, env);
 
     if (lhs->type == values::ValueType::Number && rhs->type == values::ValueType::Number) {
-        return evaluate_numeric_binary_expr(dynamic_cast<values::NumVal*>(lhs), dynamic_cast<values::NumVal*>(rhs), binop->op);
+        return evaluate_numeric_binary_expr(std::make_unique<values::NumVal>(dynamic_cast<values::NumVal*>(lhs.get())), std::make_unique<values::NumVal>(dynamic_cast<values::NumVal*>(rhs.get())), binop->op);
     }
 
-    return new values::RuntimeVal();
+    return std::make_unique<values::RuntimeVal>();
 }
 
-values::RuntimeVal* interpreter::evaluate_identifier(AST::Identifier* ident, Environment* env) {
-    return env->lookupVar(ident->symbol);
+std::unique_ptr<values::RuntimeVal> interpreter::evaluate_identifier(AST::Identifier* ident, Environment* env) {
+    return std::make_unique<values::RuntimeVal>(env->lookupVar(ident->symbol));
 }
 
-values::RuntimeVal* interpreter::evaluate_object_expr(AST::ObjectLiteral* obj, Environment* env) {
-    auto object = new values::ObjectVal();
+std::unique_ptr<values::RuntimeVal> interpreter::evaluate_object_expr(AST::ObjectLiteral* obj, Environment* env) {
+    auto object = std::make_unique<values::ObjectVal>();
 
     for (auto& prop : obj->properties) {
-        auto runtimeVal = (prop->value.value() == nullptr) ? env->lookupVar(prop->key) : evaluate(dynamic_cast<AST::Stmt*>(prop->value.value()), env);
+        auto runtimeVal = (prop->value.value() == nullptr) ? std::make_unique<values::RuntimeVal>(env->lookupVar(prop->key)) : evaluate(dynamic_cast<AST::Stmt*>(prop->value.value()), env);
 
         object->properties.emplace(prop->key, runtimeVal);
     }
@@ -59,35 +57,32 @@ values::RuntimeVal* interpreter::evaluate_object_expr(AST::ObjectLiteral* obj, E
     return object;
 }
 
-values::RuntimeVal* interpreter::evaluate_call_expr(AST::CallExpr* expr, Environment* env) {
-    std::deque<values::RuntimeVal*> args;
+std::unique_ptr<values::RuntimeVal> interpreter::evaluate_call_expr(AST::CallExpr* expr, Environment* env) {
+    std::deque<std::unique_ptr<values::RuntimeVal>> args;
     for (auto& arg : expr->args) {
         args.push_back(evaluate(arg, env));
     }
     auto fn = evaluate(expr->caller, env);
 
     if (fn->type == values::ValueType::NativeFn) {
-        auto result = dynamic_cast<values::NativeFnValue*>(fn)->call(args, env);
+        auto result = dynamic_cast<values::NativeFnValue*>(fn.get())->call(args, env);
         return result;
     }
 
     if (fn->type == values::ValueType::Function) {
         
-        auto func = dynamic_cast<values::FunValue*>(fn);
-        auto scope = new Environment(func->decEnv);
+        auto func = dynamic_cast<values::FunValue*>(fn.get());
+        auto scope = std::unique_ptr<Environment>(func->decEnv);
 
         for (int i = 0; i < func->params.size(); ++i) {
             auto name = func->params[i];
-            scope->declareVar(name, args[i], false);
+            scope->declareVar(name, std::move(args[i]), false);
         }
 
-        auto result = new values::RuntimeVal();
+        auto result = std::unique_ptr<values::RuntimeVal>();
         for (auto& stmt : func->body) {
-            result = evaluate(stmt, scope);
+            result = evaluate(stmt, scope.get());
         }
-
-        delete func;
-        delete scope;
 
         return result;
     }
@@ -97,12 +92,12 @@ values::RuntimeVal* interpreter::evaluate_call_expr(AST::CallExpr* expr, Environ
     throw std::runtime_error("Interpreter: Cannot call value that is not a function.");
 }
 
-values::RuntimeVal* interpreter::evaluate_var_declaration(AST::VarDeclare* declaration, Environment* env) {
+std::unique_ptr<values::RuntimeVal> interpreter::evaluate_var_declaration(AST::VarDeclare* declaration, Environment* env) {
     auto value = declaration->value ? evaluate(declaration->value.value(), env) : utils::MK_NULL();
-    return env->declareVar(declaration->identifier, value, declaration->constant);
+    return env->declareVar(declaration->identifier, std::move(value), declaration->constant);
 }
 
-values::RuntimeVal* interpreter::evaluate_assignment(AST::AssignExpr* node, Environment* env) {
+std::unique_ptr<values::RuntimeVal> interpreter::evaluate_assignment(AST::AssignExpr* node, Environment* env) {
     if (node->assigne->kind != AST::NodeType::Identifier) {
         throw std::runtime_error(fmt::format("Invalid LHS in assignment expression."));
     }
@@ -110,22 +105,22 @@ values::RuntimeVal* interpreter::evaluate_assignment(AST::AssignExpr* node, Envi
     return env->assignVar(name, evaluate(node->value, env));
 }
 
-values::RuntimeVal* interpreter::evaluate_fun_declaration(AST::FunDeclare* declaration, Environment* env) {
-    auto fn = new values::FunValue();
+std::unique_ptr<values::RuntimeVal> interpreter::evaluate_fun_declaration(AST::FunDeclare* declaration, Environment* env) {
+    auto fn = std::make_unique<values::FunValue>();
     fn->name = declaration->name;
     fn->params = declaration->parameters;
     fn->decEnv = env;
     fn->body = declaration->body;
 
-    return env->declareVar(declaration->name, fn, true);
+    return env->declareVar(declaration->name, std::move(fn), true);
 }
 
-values::RuntimeVal* interpreter::evaluate_if_statement(AST::IfStmt* ifstmt, Environment* env) {
-    bool condition = dynamic_cast<values::BoolVal*>(evaluate(ifstmt->condition, env))->value;
+std::unique_ptr<values::RuntimeVal> interpreter::evaluate_if_statement(AST::IfStmt* ifstmt, Environment* env) {
+    bool condition = dynamic_cast<values::BoolVal*>(evaluate(ifstmt->condition, env).get())->value;
 
     bool hasElse = ifstmt->elseStmt.has_value();
 
-    values::RuntimeVal* lastEvaluated = new values::RuntimeVal();
+    auto lastEvaluated = std::make_unique<values::RuntimeVal>();
 
     if (!hasElse) {
         if (condition) {
@@ -151,9 +146,9 @@ values::RuntimeVal* interpreter::evaluate_if_statement(AST::IfStmt* ifstmt, Envi
     return lastEvaluated;
 }
 
-values::RuntimeVal* interpreter::evaluate_comparison_expr(AST::CompEx* compEx, Environment* env) {
-    auto left = dynamic_cast<values::NumVal*>(evaluate(compEx->left, env));
-    auto right = dynamic_cast<values::NumVal*>(evaluate(compEx->right, env));
+std::unique_ptr<values::RuntimeVal> interpreter::evaluate_comparison_expr(AST::CompEx* compEx, Environment* env) {
+    auto left = dynamic_cast<values::NumVal*>(evaluate(compEx->left, env).get());
+    auto right = dynamic_cast<values::NumVal*>(evaluate(compEx->right, env).get());
 
     bool result;
 
@@ -163,13 +158,11 @@ values::RuntimeVal* interpreter::evaluate_comparison_expr(AST::CompEx* compEx, E
     if (compEx->op == ">=") result = left->value >= right->value; else
     if (compEx->op == "<=") result = left->value <= right->value;
 
-    delete left;
-    delete right;
 
     return utils::MK_BOOL(result);
 }
 
-values::RuntimeVal* interpreter::evaluate_member_expr(AST::MemberExpr* member, Environment* env) {
+std::unique_ptr<values::RuntimeVal> interpreter::evaluate_member_expr(AST::MemberExpr* member, Environment* env) {
     auto objectVal = evaluate(member->object, env);
 
     auto propertyIdent = dynamic_cast<AST::Identifier*>(member->property);
@@ -180,12 +173,12 @@ values::RuntimeVal* interpreter::evaluate_member_expr(AST::MemberExpr* member, E
     auto propertyName = propertyIdent->symbol;
 
     if (objectVal->type == values::ValueType::Object) {
-        auto object = dynamic_cast<values::ObjectVal*>(objectVal);
+        auto object = dynamic_cast<values::ObjectVal*>(objectVal.get());
 
         auto it = object->properties.find(propertyName);
         if (it != object->properties.end()) {
             delete object;
-            return it->second;
+            return std::move(it->second);
         } else {
             throw std::runtime_error(fmt::format("Property '{}' does not exist on the object.", propertyName));
         }
@@ -194,17 +187,17 @@ values::RuntimeVal* interpreter::evaluate_member_expr(AST::MemberExpr* member, E
     throw std::runtime_error("Interpreter: Attempted to access a member on a non-object type.");
 }
 
-values::RuntimeVal* interpreter::evaluate_string(AST::StringLiteral* string, Environment* env) {
-    auto stringVal = new values::StringVal();
+std::unique_ptr<values::RuntimeVal> interpreter::evaluate_string(AST::StringLiteral* string, Environment* env) {
+    auto stringVal = std::make_unique<values::StringVal>();
     stringVal->value = string->value;
     return stringVal;
 }
 
-values::RuntimeVal* interpreter::evaluate_while_statement(AST::WhileStmt* whilestmt, Environment* env) {
-    auto lastEvaluated = new values::RuntimeVal();
+std::unique_ptr<values::RuntimeVal> interpreter::evaluate_while_statement(AST::WhileStmt* whilestmt, Environment* env) {
+    auto lastEvaluated =std::make_unique<values::RuntimeVal>();
 
     while (true) {
-        bool condition = dynamic_cast<values::BoolVal*>(evaluate(whilestmt->condition, env))->value;
+        bool condition = dynamic_cast<values::BoolVal*>(evaluate(whilestmt->condition, env).get())->value;
 
         if (!condition) break;
         try {
@@ -220,10 +213,10 @@ values::RuntimeVal* interpreter::evaluate_while_statement(AST::WhileStmt* whiles
     return lastEvaluated;
 }
 
-values::RuntimeVal* interpreter::evaluate(AST::Stmt* astNode, Environment* env) {
+std::unique_ptr<values::RuntimeVal> interpreter::evaluate(AST::Stmt* astNode, Environment* env) {
     switch (astNode->kind) {
         case AST::NodeType::NumericLiteral: {
-            auto value = new values::NumVal();
+            auto value = std::make_unique<values::NumVal>();
             value->value = dynamic_cast<AST::NumericLiteral*>(astNode)->value;
             return value;
         }

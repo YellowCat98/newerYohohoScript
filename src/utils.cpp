@@ -8,6 +8,8 @@
 #include <fmt/core.h>
 #include "utils.hpp"
 
+using namespace runtime;
+
 namespace utils {
     bool isAlpha(const std::string& str) {
         for (char ch : str) {
@@ -42,30 +44,30 @@ namespace utils {
         return new File(buffer.str(), fileName);
     }
 
-    runtime::values::NumVal* MK_NUM(int value) {
-        auto return_val = new runtime::values::NumVal();
+    std::unique_ptr<values::NumVal> MK_NUM(int value) {
+        auto return_val = std::make_unique<values::NumVal>();
         return_val->value = value;
         return return_val;
     }
 
-    runtime::values::NullVal* MK_NULL() {
-        return new runtime::values::NullVal();
+    std::unique_ptr<values::NullVal> MK_NULL() {
+        return std::make_unique<values::NullVal>();
     }
-    
-    runtime::values::NativeFnValue* MK_NATIVE_FN(runtime::values::FunctionCall call) {
-        auto return_val = new runtime::values::NativeFnValue();
+
+    std::unique_ptr<values::NativeFnValue> MK_NATIVE_FN(values::FunctionCall call) {
+        auto return_val = std::make_unique<values::NativeFnValue>();
         return_val->call = call;
         return return_val;
     }
 
-    runtime::values::BoolVal* MK_BOOL(bool value) {
-        auto return_val = new runtime::values::BoolVal();
+    std::unique_ptr<values::BoolVal> MK_BOOL(bool value) {
+        auto return_val = std::make_unique<values::BoolVal>();
         return_val->value = value;
         return return_val;
     }
 
-    runtime::values::StringVal* MK_STRING(const std::string& value) {
-        auto return_val = new runtime::values::StringVal();
+    std::unique_ptr<values::StringVal> MK_STRING(const std::string& value) {
+        auto return_val = std::make_unique<values::StringVal>();
         return_val->value = value;
         return return_val;
     }

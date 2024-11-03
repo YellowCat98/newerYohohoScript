@@ -10,15 +10,15 @@ namespace runtime {
     class Environment {
     private:
         Environment* parent;
-        std::unordered_map<std::string, values::RuntimeVal*> variables;
+        std::unordered_map<std::string, std::unique_ptr<values::RuntimeVal>> variables;
         std::set<std::string> constants;
     public:
         Environment(Environment* parent) : parent(parent) {
             bool global = this->parent ? true : false;
         }
-        values::RuntimeVal* declareVar(const std::string& name, values::RuntimeVal* value, bool constant);
-        values::RuntimeVal* assignVar(const std::string& name, values::RuntimeVal* value);
-        values::RuntimeVal* lookupVar(const std::string& name);
+        std::unique_ptr<values::RuntimeVal> declareVar(const std::string& name, std::unique_ptr<values::RuntimeVal> value, bool constant);
+        std::unique_ptr<values::RuntimeVal> assignVar(const std::string& name, std::unique_ptr<values::RuntimeVal> value);
+        std::unique_ptr<values::RuntimeVal> lookupVar(const std::string& name);
         Environment* resolve(const std::string& name);
 
         static Environment* setupEnv();
