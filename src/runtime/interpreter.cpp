@@ -35,23 +35,23 @@ std::unique_ptr<values::RuntimeVal> interpreter::evaluate_binary_expr(AST::BinEx
     auto rhs = evaluate(binop->right, env);
 
     if (lhs->type == values::ValueType::Number && rhs->type == values::ValueType::Number) {
-        return evaluate_numeric_binary_expr(std::make_unique<values::NumVal>(dynamic_cast<values::NumVal*>(lhs.get())), std::make_unique<values::NumVal>(dynamic_cast<values::NumVal*>(rhs.get())), binop->op);
+        return evaluate_numeric_binary_expr(std::move(std::make_unique<values::NumVal>(*dynamic_cast<values::NumVal*>(lhs.get()))), std::move(std::make_unique<values::NumVal>(*dynamic_cast<values::NumVal*>(rhs.get()))), binop->op);
     }
 
     return std::make_unique<values::RuntimeVal>();
 }
 
 std::unique_ptr<values::RuntimeVal> interpreter::evaluate_identifier(AST::Identifier* ident, Environment* env) {
-    return std::make_unique<values::RuntimeVal>(env->lookupVar(ident->symbol));
+    return env->lookupVar(ident->symbol);
 }
 
 std::unique_ptr<values::RuntimeVal> interpreter::evaluate_object_expr(AST::ObjectLiteral* obj, Environment* env) {
     auto object = std::make_unique<values::ObjectVal>();
 
     for (auto& prop : obj->properties) {
-        auto runtimeVal = (prop->value.value() == nullptr) ? std::make_unique<values::RuntimeVal>(env->lookupVar(prop->key)) : evaluate(dynamic_cast<AST::Stmt*>(prop->value.value()), env);
+        auto runtimeVal = (prop->value.value() == nullptr) ? env->lookupVar(prop->key) : evaluate(dynamic_cast<AST::Stmt*>(prop->value.value()), env);
 
-        object->properties.emplace(prop->key, runtimeVal);
+        object->properties.emplace(prop->key, std::move(runtimeVal));
     }
 
     return object;
@@ -60,12 +60,12 @@ std::unique_ptr<values::RuntimeVal> interpreter::evaluate_object_expr(AST::Objec
 std::unique_ptr<values::RuntimeVal> interpreter::evaluate_call_expr(AST::CallExpr* expr, Environment* env) {
     std::deque<std::unique_ptr<values::RuntimeVal>> args;
     for (auto& arg : expr->args) {
-        args.push_back(evaluate(arg, env));
+        args.push_back(std::move(evaluate(arg, env)));
     }
     auto fn = evaluate(expr->caller, env);
 
     if (fn->type == values::ValueType::NativeFn) {
-        auto result = dynamic_cast<values::NativeFnValue*>(fn.get())->call(args, env);
+        auto result = dynamic_cast<values::NativeFnValue*>(fn.get())->call(std::move(args), env);
         return result;
     }
 

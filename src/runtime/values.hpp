@@ -4,6 +4,7 @@
 #include <functional>
 #include <deque>
 #include "../frontend/ast.hpp"
+#include <memory>
 
 namespace runtime {
     class Environment;

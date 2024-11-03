@@ -77,12 +77,12 @@ std::unique_ptr<values::RuntimeVal> Environment::assignVar(const std::string& na
         throw std::runtime_error(fmt::format("Cannot reassign to {} as it is constant.", name));
     }
     env->variables[name] = std::move(value);
-    return nullptr;
+    return value;
 }
 
 std::unique_ptr<values::RuntimeVal> Environment::lookupVar(const std::string& name) {
     auto env = this->resolve(name);
-    return std::make_unique<values::RuntimeVal>(env->variables[name]);
+    return std::move(env->variables[name]);
 }
 
 Environment* Environment::resolve(const std::string& name) {
