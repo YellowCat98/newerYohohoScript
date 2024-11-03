@@ -16,10 +16,10 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v3
 
-      - name: Set up CMake
-        uses: lukka/get-cmake@v3
-        with:
-          cmakeVersion: '3.24.1'  # Specify the CMake version you want to use
+      - name: Install CMake
+        run: |
+          choco install cmake --install-args 'ADD_CMAKE_TO_PATH=System' --yes
+        shell: powershell
 
       - name: Configure with CMake
         run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64
@@ -32,4 +32,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: Windows-Build
-          path: build/Release/  # Adjust if your output path is different
+          path: build/Release/
