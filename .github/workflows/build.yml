@@ -33,3 +33,16 @@ jobs:
         with:
           name: Windows-Build
           path: build/Release/
+      
+      - name: Upload Nightly
+        uses: andelf/nightly-release@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: nightly
+          name: 'Nightly'
+          prerelease: true
+          body: |
+            This is the latest build for commit ${{ github.sha }}
+            This build may not be stable. might cause crashes
+          files: build/Release/
