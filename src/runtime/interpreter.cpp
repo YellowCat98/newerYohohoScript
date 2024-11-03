@@ -24,6 +24,9 @@ values::NumVal* interpreter::evaluate_numeric_binary_expr(values::NumVal* lhs, v
     if (op == "/") result = lhs->value / rhs->value; else
     result = lhs->value % rhs->value;
 
+    delete lhs;
+    delete rhs;
+
     auto returnvalue = new values::NumVal();
     returnvalue->value = result;
     return returnvalue;
@@ -37,12 +40,14 @@ values::RuntimeVal* interpreter::evaluate_binary_expr(AST::BinEx* binop, Environ
         return evaluate_numeric_binary_expr(dynamic_cast<values::NumVal*>(lhs), dynamic_cast<values::NumVal*>(rhs), binop->op);
     }
 
+    delete lhs;
+    delete rhs;
+
     return new values::RuntimeVal();
 }
 
 values::RuntimeVal* interpreter::evaluate_identifier(AST::Identifier* ident, Environment* env) {
-    auto val = env->lookupVar(ident->symbol);
-    return val;
+    return env->lookupVar(ident->symbol);
 }
 
 values::RuntimeVal* interpreter::evaluate_object_expr(AST::ObjectLiteral* obj, Environment* env) {
@@ -84,8 +89,13 @@ values::RuntimeVal* interpreter::evaluate_call_expr(AST::CallExpr* expr, Environ
             result = evaluate(stmt, scope);
         }
 
+        delete func;
+        delete scope;
+
         return result;
     }
+
+    delete expr;
 
     throw std::runtime_error("Interpreter: Cannot call value that is not a function.");
 }
@@ -156,6 +166,9 @@ values::RuntimeVal* interpreter::evaluate_comparison_expr(AST::CompEx* compEx, E
     if (compEx->op == ">=") result = left->value >= right->value; else
     if (compEx->op == "<=") result = left->value <= right->value;
 
+    delete left;
+    delete right;
+
     return utils::MK_BOOL(result);
 }
 
@@ -174,6 +187,7 @@ values::RuntimeVal* interpreter::evaluate_member_expr(AST::MemberExpr* member, E
 
         auto it = object->properties.find(propertyName);
         if (it != object->properties.end()) {
+            delete object;
             return it->second;
         } else {
             throw std::runtime_error(fmt::format("Property '{}' does not exist on the object.", propertyName));
@@ -190,7 +204,7 @@ values::RuntimeVal* interpreter::evaluate_string(AST::StringLiteral* string, Env
 }
 
 values::RuntimeVal* interpreter::evaluate_while_statement(AST::WhileStmt* whilestmt, Environment* env) {
-    auto lastEvaluated = new values::RuntimeVal(); // Initialize lastEvaluated to null
+    auto lastEvaluated = new values::RuntimeVal();
 
     while (true) {
         bool condition = dynamic_cast<values::BoolVal*>(evaluate(whilestmt->condition, env))->value;
