@@ -87,8 +87,6 @@ std::unique_ptr<values::RuntimeVal> interpreter::evaluate_call_expr(AST::CallExp
         return result;
     }
 
-    delete expr;
-
     throw std::runtime_error("Interpreter: Cannot call value that is not a function.");
 }
 
@@ -177,7 +175,6 @@ std::unique_ptr<values::RuntimeVal> interpreter::evaluate_member_expr(AST::Membe
 
         auto it = object->properties.find(propertyName);
         if (it != object->properties.end()) {
-            delete object;
             return std::move(it->second);
         } else {
             throw std::runtime_error(fmt::format("Property '{}' does not exist on the object.", propertyName));

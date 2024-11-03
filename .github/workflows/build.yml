@@ -45,4 +45,4 @@ jobs:
           body: |
             This is the latest build for commit ${{ github.sha }}
             This build may not be stable. might cause crashes
-          files: build/Release/
+          files: build/Release/yhs.exe
