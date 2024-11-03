@@ -35,7 +35,7 @@ std::unique_ptr<values::RuntimeVal> interpreter::evaluate_binary_expr(AST::BinEx
     auto rhs = evaluate(binop->right, env);
 
     if (lhs->type == values::ValueType::Number && rhs->type == values::ValueType::Number) {
-        return evaluate_numeric_binary_expr(std::move(std::make_unique<values::NumVal>(*dynamic_cast<values::NumVal*>(lhs.get()))), std::move(std::make_unique<values::NumVal>(*dynamic_cast<values::NumVal*>(rhs.get()))), binop->op);
+        return evaluate_numeric_binary_expr(std::make_unique<values::NumVal>(*dynamic_cast<values::NumVal*>(lhs.get())), std::make_unique<values::NumVal>(*dynamic_cast<values::NumVal*>(rhs.get())), binop->op);
     }
 
     return std::make_unique<values::RuntimeVal>();
