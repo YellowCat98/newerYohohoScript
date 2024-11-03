@@ -58,14 +58,14 @@ std::unique_ptr<values::RuntimeVal> interpreter::evaluate_object_expr(AST::Objec
 }
 
 std::unique_ptr<values::RuntimeVal> interpreter::evaluate_call_expr(AST::CallExpr* expr, Environment* env) {
-    std::deque<std::unique_ptr<values::RuntimeVal>> args;
+    std::deque<std::shared_ptr<values::RuntimeVal>> args;
     for (auto& arg : expr->args) {
-        args.push_back(std::move(evaluate(arg, env)));
+        args.push_back(evaluate(arg, env));
     }
     auto fn = evaluate(expr->caller, env);
 
     if (fn->type == values::ValueType::NativeFn) {
-        auto result = static_cast<values::NativeFnValue*>(fn.get())->call(std::move(args), env);
+        auto result = static_cast<values::NativeFnValue*>(fn.get())->call(args, env);
         return result;
     }
 
@@ -76,7 +76,7 @@ std::unique_ptr<values::RuntimeVal> interpreter::evaluate_call_expr(AST::CallExp
 
         for (int i = 0; i < func->params.size(); ++i) {
             auto name = func->params[i];
-            scope->declareVar(name, std::move(args[i]), false);
+            scope->declareVar(name, std::unique_ptr<values::RuntimeVal>(args[i].get()), false);
         }
 
         auto result = std::unique_ptr<values::RuntimeVal>();
@@ -150,7 +150,7 @@ std::unique_ptr<values::RuntimeVal> interpreter::evaluate_comparison_expr(AST::C
     auto left = static_cast<values::NumVal*>(evaluate(compEx->left, env).get());
     auto right = static_cast<values::NumVal*>(evaluate(compEx->right, env).get());
 
-    bool result;
+    bool result = false;
 
     if (compEx->op == "<") result = left->value < right->value; else
     if (compEx->op == ">") result = left->value > right->value; else
@@ -194,7 +194,7 @@ std::unique_ptr<values::RuntimeVal> interpreter::evaluate_string(AST::StringLite
 }
 
 std::unique_ptr<values::RuntimeVal> interpreter::evaluate_while_statement(AST::WhileStmt* whilestmt, Environment* env) {
-    auto lastEvaluated =std::make_unique<values::RuntimeVal>();
+    auto lastEvaluated = std::make_unique<values::RuntimeVal>();
 
     while (true) {
         bool condition = static_cast<values::BoolVal*>(evaluate(whilestmt->condition, env).get())->value;
@@ -207,9 +207,7 @@ std::unique_ptr<values::RuntimeVal> interpreter::evaluate_while_statement(AST::W
         } catch (const utils::Break&) {
             break;
         }
-
     }
-
     return lastEvaluated;
 }
 

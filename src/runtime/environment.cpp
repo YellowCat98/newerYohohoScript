@@ -10,7 +10,7 @@ Environment* Environment::setupEnv() {
     env->declareVar("true", utils::MK_BOOL(true), true);
     env->declareVar("false", utils::MK_BOOL(false), true);
 
-    env->declareVar("print", utils::MK_NATIVE_FN([](std::deque<std::unique_ptr<values::RuntimeVal>> args, Environment* scope) -> std::unique_ptr<values::RuntimeVal> {
+    env->declareVar("print", utils::MK_NATIVE_FN([](std::deque<std::shared_ptr<values::RuntimeVal>> args, Environment* scope) -> std::unique_ptr<values::RuntimeVal> {
         for (auto& arg : args) {
             if (arg->type == values::ValueType::Number) {
                 std::cout << dynamic_cast<values::NumVal*>(arg.get())->value;
@@ -29,11 +29,11 @@ Environment* Environment::setupEnv() {
         return std::make_unique<values::RuntimeVal>();
     }), true);
 
-    env->declareVar("throw", utils::MK_NATIVE_FN([](std::deque<std::unique_ptr<values::RuntimeVal>> args, Environment* scope) -> std::unique_ptr<values::RuntimeVal> {
+    env->declareVar("throw", utils::MK_NATIVE_FN([](std::deque<std::shared_ptr<values::RuntimeVal>> args, Environment* scope) -> std::unique_ptr<values::RuntimeVal> {
         throw std::invalid_argument(std::to_string(dynamic_cast<values::NumVal*>(args[0].get())->value));
     }), true);
 
-    env->declareVar("input", utils::MK_NATIVE_FN([](std::deque<std::unique_ptr<values::RuntimeVal>> args, Environment* scope) -> std::unique_ptr<values::RuntimeVal> {
+    env->declareVar("input", utils::MK_NATIVE_FN([](std::deque<std::shared_ptr<values::RuntimeVal>> args, Environment* scope) -> std::unique_ptr<values::RuntimeVal> {
         std::string input;
         for (auto& arg : args) {
             if (arg->type == values::ValueType::Number) {

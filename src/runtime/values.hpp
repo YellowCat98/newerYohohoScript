@@ -60,7 +60,7 @@ namespace runtime {
             std::unordered_map<std::string, std::unique_ptr<RuntimeVal>> properties;
         };
 
-        using FunctionCall = std::function<std::unique_ptr<values::RuntimeVal>(std::deque<std::unique_ptr<values::RuntimeVal>>, runtime::Environment*)>;
+        using FunctionCall = std::function<std::unique_ptr<values::RuntimeVal>(std::deque<std::shared_ptr<values::RuntimeVal>>, runtime::Environment*)>;
 
         struct NativeFnValue : public RuntimeVal {
             NativeFnValue() {
