@@ -194,10 +194,12 @@ std::unique_ptr<values::RuntimeVal> interpreter::evaluate_string(AST::StringLite
 }
 
 std::unique_ptr<values::RuntimeVal> interpreter::evaluate_while_statement(AST::WhileStmt* whilestmt, Environment* env) {
-    auto lastEvaluated = std::make_unique<values::RuntimeVal>();
+    std::unique_ptr<values::RuntimeVal> lastEvaluated;
 
     while (true) {
-        bool condition = static_cast<values::BoolVal*>(evaluate(whilestmt->condition, env).get())->value;
+        auto conditionVal = evaluate(whilestmt->condition, env);
+
+        bool condition = static_cast<values::BoolVal*>(conditionVal.get())->value;
 
         if (!condition) break;
         try {
