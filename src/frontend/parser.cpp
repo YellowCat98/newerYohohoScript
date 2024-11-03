@@ -82,8 +82,8 @@ AST::Expr* Parser::parse_call_member_expr() {
 AST::Expr* Parser::parse_call_expr(AST::Expr* caller) {
     auto call_expr = new AST::Expr();
     call_expr = new AST::CallExpr();
-    dynamic_cast<AST::CallExpr*>(call_expr)->caller = caller;
-    dynamic_cast<AST::CallExpr*>(call_expr)->args = this->parse_args();
+    static_cast<AST::CallExpr*>(call_expr)->caller = caller;
+    static_cast<AST::CallExpr*>(call_expr)->args = this->parse_args();
 
     if (at()->type == Lexer::TokenType::OpenParen) {
         call_expr = this->parse_call_expr(call_expr);
@@ -250,7 +250,7 @@ AST::Stmt* Parser::parse_fun_declaration() {
             throw std::invalid_argument("Expected params to be an identifier.");
         }
 
-        params.push_back(dynamic_cast<AST::Identifier*>(arg)->symbol); // dyanmic_cast is guaranteed to not return a nullptr, as we check if its of kind AST::NodeType::Identifier earlier, this code will never be reached if the condition isnt met.
+        params.push_back(static_cast<AST::Identifier*>(arg)->symbol); // dyanmic_cast is guaranteed to not return a nullptr, as we check if its of kind AST::NodeType::Identifier earlier, this code will never be reached if the condition isnt met.
     }
 
     expect(Lexer::TokenType::OpenBrace, "Expected '{' following function declaration.");
