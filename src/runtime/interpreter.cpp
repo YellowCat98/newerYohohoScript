@@ -24,12 +24,11 @@ values::NumVal* interpreter::evaluate_numeric_binary_expr(values::NumVal* lhs, v
     if (op == "/") result = lhs->value / rhs->value; else
     result = lhs->value % rhs->value;
 
-
+    delete lhs;
+    delete rhs;
 
     auto returnvalue = new values::NumVal();
     returnvalue->value = result;
-    delete lhs;
-    delete rhs;
     return returnvalue;
 }
 
@@ -41,7 +40,7 @@ values::RuntimeVal* interpreter::evaluate_binary_expr(AST::BinEx* binop, Environ
         return evaluate_numeric_binary_expr(dynamic_cast<values::NumVal*>(lhs), dynamic_cast<values::NumVal*>(rhs), binop->op);
     }
 
-    throw std::runtime_error("LHS and RHS must be integers.");
+    return new values::RuntimeVal();
 }
 
 values::RuntimeVal* interpreter::evaluate_identifier(AST::Identifier* ident, Environment* env) {
